@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import '../widgets/my_appbar.dart';
+import '../widgets/footer.dart';
+import '../styles/theme_provider.dart';
 import 'about_screen.dart';
 
 class HomePage extends StatefulWidget {
@@ -42,8 +45,15 @@ class _HomePageState extends State<HomePage> {
   }
 
   Widget _buildAboutContent() {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final isMobile = screenWidth < 600;
+    final isTablet = screenWidth >= 600 && screenWidth < 1200;
+
     return SingleChildScrollView(
-      padding: const EdgeInsets.symmetric(horizontal: 200, vertical: 40),
+      padding: EdgeInsets.symmetric(
+        horizontal: isMobile ? 16 : (isTablet ? 40 : 200),
+        vertical: isMobile ? 20 : 40,
+      ),
       child: Center(
         child: ConstrainedBox(
           constraints: const BoxConstraints(maxWidth: 1400),
@@ -71,13 +81,19 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Column(
-        children: [
-          MyAppbar(currentPath: currentScreen, onNavigate: navigateTo),
-          Expanded(child: _buildCurrentScreen()),
-        ],
-      ),
+    return Consumer<ThemeProvider>(
+      builder: (context, themeProvider, child) {
+        return Scaffold(
+          backgroundColor: themeProvider.themeBackgroundColor,
+          body: Column(
+            children: [
+              MyAppbar(currentPath: currentScreen, onNavigate: navigateTo),
+              Expanded(child: _buildCurrentScreen()),
+              const Footer(),
+            ],
+          ),
+        );
+      },
     );
   }
 }
