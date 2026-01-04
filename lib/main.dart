@@ -1,8 +1,13 @@
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:hassankamran/firebase_options.dart';
+import 'package:hassankamran/styles/app_theme.dart';
 
 import 'screens/home_page.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   runApp(const MyApp());
 }
 
@@ -10,9 +15,11 @@ class MyApp extends StatelessWidget {
   const MyApp({super.key});
   @override
   Widget build(BuildContext context) {
-    return const MaterialApp(
-      debugShowCheckedModeBanner: false,
-      home: HomePage(),
+    return MaterialApp(
+      darkTheme: AppTheme.dark,
+      themeMode: ThemeMode.dark,
+      debugShowCheckedModeBanner: true,
+      home: const HomePage(),
     );
   }
 }
