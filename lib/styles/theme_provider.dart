@@ -1,13 +1,8 @@
 import 'package:flutter/material.dart';
 
 class ThemeProvider extends ChangeNotifier {
-  // Theme colors - matching the image
-  static const Map<String, Color> themes = {
-    'Latte': Color(0xFFE6D5B8),
-    'Frappe': Color(0xFFE5C1CD),
-    'Macchiato': Color(0xFFC6A0F6),
-    'Mocha': Color(0xFF1E1E2E),
-  };
+  // Single theme color - Mocha
+  static const Color mochaBackgroundColor = Color(0xFF1E1E2E);
 
   // Accent colors - matching the image
   static const List<Color> accentColors = [
@@ -25,19 +20,13 @@ class ThemeProvider extends ChangeNotifier {
     Color(0xFFB4BEFE), // Lavender
   ];
 
-  String _selectedTheme = 'Mocha';
   Color _accentColor = const Color(0xFFC6A0F6);
   bool _backgroundEffect = true;
 
-  String get selectedTheme => _selectedTheme;
+  String get selectedTheme => 'Mocha'; // Always Mocha
   Color get accentColor => _accentColor;
   bool get backgroundEffect => _backgroundEffect;
-  Color get themeBackgroundColor => themes[_selectedTheme] ?? themes['Mocha']!;
-
-  void setTheme(String theme) {
-    _selectedTheme = theme;
-    notifyListeners();
-  }
+  Color get themeBackgroundColor => mochaBackgroundColor;
 
   void setAccentColor(Color color) {
     _accentColor = color;

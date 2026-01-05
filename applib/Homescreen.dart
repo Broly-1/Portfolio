@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'screens/edit_about_screen.dart';
+import 'screens/manage_projects_screen.dart';
 
 class AdminHomeScreen extends StatelessWidget {
   const AdminHomeScreen({super.key});
@@ -86,10 +87,12 @@ class AdminHomeScreen extends StatelessWidget {
               icon: Icons.work,
               description: 'Manage portfolio projects',
               onTap: () {
-                // TODO: Navigate to projects management
-                ScaffoldMessenger.of(
+                Navigator.push(
                   context,
-                ).showSnackBar(const SnackBar(content: Text('Coming soon!')));
+                  MaterialPageRoute(
+                    builder: (context) => const ManageProjectsScreen(),
+                  ),
+                );
               },
             ),
             _buildAdminCard(

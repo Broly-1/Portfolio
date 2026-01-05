@@ -4,6 +4,7 @@ import '../widgets/my_appbar.dart';
 import '../widgets/footer.dart';
 import '../styles/theme_provider.dart';
 import 'about_screen.dart';
+import 'projects_screen.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -68,7 +69,7 @@ class _HomePageState extends State<HomePage> {
   }
 
   Widget _buildProjectsContent() {
-    return const Center(child: Text('Projects - Coming Soon'));
+    return const ProjectsScreen();
   }
 
   Widget _buildResumeContent() {

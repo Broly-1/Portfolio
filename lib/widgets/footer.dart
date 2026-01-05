@@ -311,8 +311,6 @@ class _FooterState extends State<Footer> with SingleTickerProviderStateMixin {
   }
 
   Widget _buildMobileFooter(Color textColor) {
-    final themeProvider = Provider.of<ThemeProvider>(context);
-
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [

@@ -1,10 +1,15 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_storage/firebase_storage.dart';
+import 'dart:io';
+import 'package:hassankamran/models/project.dart';
 
 class FirebaseService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  final FirebaseStorage _storage = FirebaseStorage.instance;
 
   // Collection references
   static const String _aboutCollection = 'about';
+  static const String _projectsCollection = 'projects';
 
   // Get About data
   Future<Map<String, dynamic>?> getAboutData() async {
@@ -66,6 +71,142 @@ class FirebaseService {
     } catch (e) {
       print('❌ Error getting view count: $e');
       return 0;
+    }
+  }
+
+  // ==================== PROJECT METHODS ====================
+
+  // Get all projects
+  Future<List<Project>> getProjects() async {
+    try {
+      print('🔍 Fetching projects from Firestore...');
+      final snapshot = await _firestore
+          .collection(_projectsCollection)
+          .orderBy('order')
+          .get();
+
+      print('📄 Found ${snapshot.docs.length} projects');
+      return snapshot.docs.map((doc) => Project.fromFirestore(doc)).toList();
+    } catch (e) {
+      print('❌ Error getting projects: $e');
+      return [];
+    }
+  }
+
+  // Stream all projects (real-time updates)
+  Stream<List<Project>> streamProjects() {
+    return _firestore
+        .collection(_projectsCollection)
+        .orderBy('order')
+        .snapshots()
+        .map(
+          (snapshot) =>
+              snapshot.docs.map((doc) => Project.fromFirestore(doc)).toList(),
+        );
+  }
+
+  // Get single project by ID
+  Future<Project?> getProject(String projectId) async {
+    try {
+      print('🔍 Fetching project $projectId...');
+      final doc = await _firestore
+          .collection(_projectsCollection)
+          .doc(projectId)
+          .get();
+
+      if (doc.exists) {
+        return Project.fromFirestore(doc);
+      }
+      return null;
+    } catch (e) {
+      print('❌ Error getting project: $e');
+      return null;
+    }
+  }
+
+  // Create new project
+  Future<String?> createProject(Project project) async {
+    try {
+      print('➕ Creating new project...');
+      final docRef = await _firestore
+          .collection(_projectsCollection)
+          .add(project.toMap());
+
+      print('✅ Project created with ID: ${docRef.id}');
+      return docRef.id;
+    } catch (e) {
+      print('❌ Error creating project: $e');
+      return null;
+    }
+  }
+
+  // Update existing project
+  Future<bool> updateProject(String projectId, Project project) async {
+    try {
+      print('📝 Updating project $projectId...');
+      await _firestore
+          .collection(_projectsCollection)
+          .doc(projectId)
+          .update(project.toMap());
+
+      print('✅ Project updated successfully');
+      return true;
+    } catch (e) {
+      print('❌ Error updating project: $e');
+      return false;
+    }
+  }
+
+  // Delete project
+  Future<bool> deleteProject(String projectId) async {
+    try {
+      print('🗑️ Deleting project $projectId...');
+
+      // First get the project to delete its thumbnail if exists
+      final project = await getProject(projectId);
+      if (project?.thumbnailUrl != null) {
+        await deleteThumbnail(project!.thumbnailUrl!);
+      }
+
+      // Then delete the document
+      await _firestore.collection(_projectsCollection).doc(projectId).delete();
+
+      print('✅ Project deleted successfully');
+      return true;
+    } catch (e) {
+      print('❌ Error deleting project: $e');
+      return false;
+    }
+  }
+
+  // Upload project thumbnail
+  Future<String?> uploadThumbnail(File file, String projectId) async {
+    try {
+      print('📤 Uploading thumbnail for project $projectId...');
+
+      final ref = _storage.ref().child('projects/$projectId/thumbnail.png');
+      final uploadTask = await ref.putFile(file);
+      final downloadUrl = await uploadTask.ref.getDownloadURL();
+
+      print('✅ Thumbnail uploaded: $downloadUrl');
+      return downloadUrl;
+    } catch (e) {
+      print('❌ Error uploading thumbnail: $e');
+      return null;
+    }
+  }
+
+  // Delete thumbnail from storage
+  Future<bool> deleteThumbnail(String imageUrl) async {
+    try {
+      print('🗑️ Deleting thumbnail...');
+      final ref = _storage.refFromURL(imageUrl);
+      await ref.delete();
+      print('✅ Thumbnail deleted');
+      return true;
+    } catch (e) {
+      print('❌ Error deleting thumbnail: $e');
+      return false;
     }
   }
 }

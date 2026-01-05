@@ -20,7 +20,7 @@ class MyAppbar extends StatelessWidget {
     return Padding(
       padding: EdgeInsets.symmetric(
         horizontal: isMobile ? 16.0 : 300.0,
-        vertical: 30.0,
+        vertical: isMobile ? 8.0 : 16.0,
       ),
       child: Row(
         children: [
@@ -122,6 +122,7 @@ class AppMenus extends StatelessWidget {
 
   void _showMobileMenu(BuildContext context) {
     final isMobile = MediaQuery.of(context).size.width < 600;
+
     showGeneralDialog(
       context: context,
       barrierDismissible: true,
@@ -129,133 +130,120 @@ class AppMenus extends StatelessWidget {
       barrierColor: Colors.black.withOpacity(0.5),
       transitionDuration: const Duration(milliseconds: 300),
       pageBuilder: (context, animation, secondaryAnimation) {
-        return Align(
-          alignment: Alignment.centerRight,
-          child: Material(
-            color: const Color(0xFF1E1E2E),
-            child: Container(
-              width:
-                  MediaQuery.of(context).size.width * (isMobile ? 0.6 : 0.25),
-              height: double.infinity,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // Header with close button
-                  Padding(
-                    padding: const EdgeInsets.all(16.0),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        const Text(
-                          'Navigation',
-                          style: TextStyle(
-                            fontSize: 24,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white,
-                          ),
-                        ),
-                        IconButton(
-                          icon: const Icon(Icons.close, color: Colors.white),
-                          onPressed: () => Navigator.pop(context),
-                        ),
-                      ],
-                    ),
-                  ),
-                  const Divider(color: Color(0xFF313244)),
+        return Consumer<ThemeProvider>(
+          builder: (context, themeProvider, child) {
+            // Check if background is light based on luminance
+            final bgColor = themeProvider.themeBackgroundColor;
+            final isLightTheme = bgColor.computeLuminance() > 0.5;
 
-                  // Theme Section
-                  Padding(
-                    padding: const EdgeInsets.all(16.0),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Row(
+            final textColor = isLightTheme ? Colors.black87 : Colors.white;
+            final iconColor = isLightTheme ? Colors.black87 : Colors.white;
+            final dividerColor = isLightTheme
+                ? Colors.grey[300]!
+                : const Color(0xFF313244);
+
+            // Make drawer darker than theme background
+            final baseColor = themeProvider.themeBackgroundColor;
+            final drawerColor = Color.lerp(
+              baseColor,
+              Colors.black,
+              isLightTheme ? 0.1 : 0.2,
+            )!;
+
+            return Align(
+              alignment: Alignment.centerRight,
+              child: Material(
+                color: drawerColor,
+                child: Container(
+                  width:
+                      MediaQuery.of(context).size.width *
+                      (isMobile ? 0.6 : 0.18),
+                  height: double.infinity,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // Header with close button
+                      Padding(
+                        padding: const EdgeInsets.all(16.0),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            Icon(Icons.palette, color: Colors.white, size: 20),
-                            SizedBox(width: 8),
                             Text(
-                              'Theme',
+                              'Navigation',
                               style: TextStyle(
-                                fontSize: 18,
+                                fontSize: 24,
                                 fontWeight: FontWeight.bold,
-                                color: Colors.white,
+                                color: textColor,
                               ),
+                            ),
+                            IconButton(
+                              icon: Icon(Icons.close, color: iconColor),
+                              onPressed: () => Navigator.pop(context),
                             ),
                           ],
                         ),
-                        const SizedBox(height: 16),
+                      ),
+                      Divider(color: dividerColor),
 
-                        // Theme buttons
-                        Consumer<ThemeProvider>(
-                          builder: (context, themeProvider, child) {
-                            return Row(
+                      // Accent colors
+                      Padding(
+                        padding: const EdgeInsets.all(16.0),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
                               children: [
-                                _buildThemeButton(
-                                  context,
-                                  'Latte',
-                                  themeProvider,
-                                ),
+                                Icon(Icons.palette, color: iconColor, size: 20),
                                 const SizedBox(width: 8),
-                                _buildThemeButton(
-                                  context,
-                                  'Frappe',
-                                  themeProvider,
-                                ),
-                                const SizedBox(width: 8),
-                                _buildThemeButton(
-                                  context,
-                                  'Macchiato',
-                                  themeProvider,
+                                Text(
+                                  'Accent Color',
+                                  style: TextStyle(
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.bold,
+                                    color: textColor,
+                                  ),
                                 ),
                               ],
-                            );
-                          },
+                            ),
+                            const SizedBox(height: 16),
+                            Consumer<ThemeProvider>(
+                              builder: (context, themeProvider, child) {
+                                return Wrap(
+                                  spacing: 8,
+                                  runSpacing: 8,
+                                  children: ThemeProvider.accentColors
+                                      .map(
+                                        (color) => _buildColorButton(
+                                          context,
+                                          color,
+                                          themeProvider,
+                                        ),
+                                      )
+                                      .toList(),
+                                );
+                              },
+                            ),
+                          ],
                         ),
-                        const SizedBox(height: 8),
-                        Consumer<ThemeProvider>(
-                          builder: (context, themeProvider, child) {
-                            return _buildThemeButton(
-                              context,
-                              'Mocha',
-                              themeProvider,
-                              fullWidth: true,
-                            );
-                          },
-                        ),
-                        const SizedBox(height: 16),
+                      ),
+                      Divider(color: dividerColor),
 
-                        // Accent colors
-                        Consumer<ThemeProvider>(
-                          builder: (context, themeProvider, child) {
-                            return Wrap(
-                              spacing: 8,
-                              runSpacing: 8,
-                              children: ThemeProvider.accentColors
-                                  .map(
-                                    (color) => _buildColorButton(
-                                      context,
-                                      color,
-                                      themeProvider,
-                                    ),
-                                  )
-                                  .toList(),
-                            );
-                          },
-                        ),
-                      ],
-                    ),
+                      // Navigation menu items
+                      _buildMenuItem(context, 'About', 'about', textColor),
+                      _buildMenuItem(context, 'Posts', 'posts', textColor),
+                      _buildMenuItem(
+                        context,
+                        'Projects',
+                        'projects',
+                        textColor,
+                      ),
+                      _buildMenuItem(context, 'Resume', 'resume', textColor),
+                    ],
                   ),
-                  const Divider(color: Color(0xFF313244)),
-
-                  // Navigation menu items
-                  _buildMenuItem(context, 'About', 'about'),
-                  _buildMenuItem(context, 'Posts', 'posts'),
-                  _buildMenuItem(context, 'Projects', 'projects'),
-                  _buildMenuItem(context, 'Resume', 'resume'),
-                ],
+                ),
               ),
-            ),
-          ),
+            );
+          },
         );
       },
       transitionBuilder: (context, animation, secondaryAnimation, child) {
@@ -268,42 +256,6 @@ class AppMenus extends StatelessWidget {
         );
       },
     );
-  }
-
-  Widget _buildThemeButton(
-    BuildContext context,
-    String theme,
-    ThemeProvider themeProvider, {
-    bool fullWidth = false,
-  }) {
-    final isSelected = themeProvider.selectedTheme == theme;
-    final child = InkWell(
-      onTap: () => themeProvider.setTheme(theme),
-      child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 12),
-        decoration: BoxDecoration(
-          color: isSelected ? const Color(0xFF313244) : Colors.transparent,
-          border: Border.all(
-            color: isSelected
-                ? themeProvider.accentColor
-                : const Color(0xFF313244),
-            width: isSelected ? 2 : 1,
-          ),
-          borderRadius: BorderRadius.circular(8),
-        ),
-        child: Center(
-          child: Text(
-            theme,
-            style: TextStyle(
-              color: isSelected ? Colors.white : Colors.grey,
-              fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-            ),
-          ),
-        ),
-      ),
-    );
-
-    return fullWidth ? child : Expanded(child: child);
   }
 
   Widget _buildColorButton(
@@ -326,23 +278,20 @@ class AppMenus extends StatelessWidget {
     );
   }
 
-  Widget _buildMenuItem(BuildContext context, String label, String route) {
-    return Consumer<ThemeProvider>(
-      builder: (context, themeProvider, child) {
-        return ListTile(
-          title: Text(
-            label,
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: 18,
-              letterSpacing: 1,
-            ),
-          ),
-          onTap: () {
-            Navigator.pop(context);
-            onNavigate(route);
-          },
-        );
+  Widget _buildMenuItem(
+    BuildContext context,
+    String label,
+    String route,
+    Color textColor,
+  ) {
+    return ListTile(
+      title: Text(
+        label,
+        style: TextStyle(color: textColor, fontSize: 18, letterSpacing: 1),
+      ),
+      onTap: () {
+        Navigator.pop(context);
+        onNavigate(route);
       },
     );
   }
