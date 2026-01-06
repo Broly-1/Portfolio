@@ -72,7 +72,7 @@ class _ProjectCardState extends State<ProjectCard> {
   Widget _buildContent(BuildContext context) {
     final themeProvider = Provider.of<ThemeProvider>(context);
     final isLightTheme = themeProvider.selectedTheme != 'Mocha';
-    final textColor = isLightTheme ? Colors.black87 : Colors.white;
+    final textColor = isLightTheme ? Colors.grey[700]! : Colors.grey[300]!;
     final dateStr = DateFormat('MMM d, y').format(widget.project.createdAt);
 
     return Column(
@@ -141,7 +141,7 @@ class _ProjectCardState extends State<ProjectCard> {
                               text: ' / ',
                               style: TextStyle(
                                 fontSize: 13,
-                                color: Colors.white.withOpacity(0.5),
+                                color: Colors.grey[500],
                               ),
                             ),
                             TextSpan(
@@ -159,10 +159,7 @@ class _ProjectCardState extends State<ProjectCard> {
                       // Description in browser
                       Text(
                         widget.project.description,
-                        style: TextStyle(
-                          fontSize: 11,
-                          color: Colors.white.withOpacity(0.8),
-                        ),
+                        style: TextStyle(fontSize: 11, color: Colors.grey[400]),
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
                       ),
@@ -189,7 +186,7 @@ class _ProjectCardState extends State<ProjectCard> {
                             'Broly-1',
                             style: TextStyle(
                               fontSize: 11,
-                              color: Colors.white.withOpacity(0.7),
+                              color: Colors.grey[400],
                               letterSpacing: 1.6,
                             ),
                           ),

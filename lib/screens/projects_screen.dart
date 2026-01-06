@@ -2,10 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:hassankamran/models/project.dart';
 import 'package:hassankamran/services/firebase_service.dart';
 import 'package:hassankamran/widgets/project_card.dart';
-import 'package:hassankamran/screens/project_detail_screen.dart';
+import 'package:hassankamran/widgets/project_detail_content.dart';
 
 class ProjectsScreen extends StatefulWidget {
-  const ProjectsScreen({super.key});
+  final String? initialExpandedProjectId;
+
+  const ProjectsScreen({super.key, this.initialExpandedProjectId});
 
   @override
   State<ProjectsScreen> createState() => _ProjectsScreenState();
@@ -13,6 +15,13 @@ class ProjectsScreen extends StatefulWidget {
 
 class _ProjectsScreenState extends State<ProjectsScreen> {
   final FirebaseService _firebaseService = FirebaseService();
+  String? _expandedProjectId;
+
+  @override
+  void initState() {
+    super.initState();
+    _expandedProjectId = widget.initialExpandedProjectId;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -111,72 +120,84 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
 
                   const SizedBox(height: 40),
 
-                  // Projects Grid
-                  LayoutBuilder(
-                    builder: (context, constraints) {
-                      final crossAxisCount = _getCrossAxisCount(
-                        constraints.maxWidth,
-                      );
+                  // Projects Grid or Expanded Detail
+                  if (_expandedProjectId != null)
+                    Builder(
+                      builder: (context) {
+                        final expandedProject = projects
+                            .cast<Project?>()
+                            .firstWhere(
+                              (p) => p?.id == _expandedProjectId,
+                              orElse: () => null,
+                            );
+                        if (expandedProject != null) {
+                          return _buildExpandedDetail(context, expandedProject);
+                        }
+                        return const SizedBox.shrink();
+                      },
+                    )
+                  else
+                    LayoutBuilder(
+                      builder: (context, constraints) {
+                        final crossAxisCount = _getCrossAxisCount(
+                          constraints.maxWidth,
+                        );
 
-                      final spacing = 20.0;
+                        final spacing = 20.0;
 
-                      return Column(
-                        children: [
-                          for (
-                            int i = 0;
-                            i < projects.length;
-                            i += crossAxisCount
-                          )
-                            Padding(
-                              padding: EdgeInsets.only(
-                                bottom: i + crossAxisCount < projects.length
-                                    ? spacing
-                                    : 0,
-                              ),
-                              child: Row(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  for (
-                                    int j = 0;
-                                    j < crossAxisCount &&
-                                        i + j < projects.length;
-                                    j++
-                                  )
-                                    Expanded(
-                                      child: Padding(
-                                        padding: EdgeInsets.only(
-                                          right: j < crossAxisCount - 1
-                                              ? spacing
-                                              : 0,
-                                        ),
-                                        child: ProjectCard(
-                                          project: projects[i + j],
-                                          onTap: () => _navigateToProjectDetail(
-                                            context,
-                                            projects[i + j],
+                        return Column(
+                          children: [
+                            for (
+                              int i = 0;
+                              i < projects.length;
+                              i += crossAxisCount
+                            )
+                              Padding(
+                                padding: EdgeInsets.only(bottom: spacing),
+                                child: Row(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    for (
+                                      int j = 0;
+                                      j < crossAxisCount &&
+                                          i + j < projects.length;
+                                      j++
+                                    )
+                                      Expanded(
+                                        child: Padding(
+                                          padding: EdgeInsets.only(
+                                            right: j < crossAxisCount - 1
+                                                ? spacing
+                                                : 0,
+                                          ),
+                                          child: ProjectCard(
+                                            project: projects[i + j],
+                                            onTap: () =>
+                                                _toggleProjectExpansion(
+                                                  projects[i + j].id,
+                                                ),
                                           ),
                                         ),
                                       ),
-                                    ),
-                                  // Fill remaining space if last row is incomplete
-                                  for (
-                                    int k = 0;
-                                    k <
-                                        crossAxisCount -
-                                            ((projects.length - i).clamp(
-                                              0,
-                                              crossAxisCount,
-                                            ));
-                                    k++
-                                  )
-                                    Expanded(child: SizedBox()),
-                                ],
+                                    // Fill remaining space if last row is incomplete
+                                    for (
+                                      int k = 0;
+                                      k <
+                                          crossAxisCount -
+                                              ((projects.length - i).clamp(
+                                                0,
+                                                crossAxisCount,
+                                              ));
+                                      k++
+                                    )
+                                      Expanded(child: SizedBox()),
+                                  ],
+                                ),
                               ),
-                            ),
-                        ],
-                      );
-                    },
-                  ),
+                          ],
+                        );
+                      },
+                    ),
                 ],
               ),
             ),
@@ -200,11 +221,44 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
     return 1;
   }
 
-  void _navigateToProjectDetail(BuildContext context, Project project) {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => ProjectDetailScreen(project: project),
+  void _toggleProjectExpansion(String projectId) {
+    setState(() {
+      if (_expandedProjectId == projectId) {
+        _expandedProjectId = null;
+      } else {
+        _expandedProjectId = projectId;
+      }
+    });
+  }
+
+  Widget _buildExpandedDetail(BuildContext context, Project project) {
+    return AnimatedSize(
+      duration: const Duration(milliseconds: 500),
+      curve: Curves.easeInOutCubic,
+      child: Container(
+        width: double.infinity,
+        padding: const EdgeInsets.all(40),
+        decoration: BoxDecoration(
+          color: const Color(0xFF2A2A3E),
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(
+            color: Theme.of(context).colorScheme.primary.withOpacity(0.3),
+            width: 2,
+          ),
+          boxShadow: [
+            BoxShadow(
+              color: Theme.of(context).colorScheme.primary.withOpacity(0.3),
+              blurRadius: 40,
+              spreadRadius: 5,
+              offset: const Offset(0, 10),
+            ),
+          ],
+        ),
+        child: ProjectDetailContent(
+          project: project,
+          showCloseButton: true,
+          onClose: () => _toggleProjectExpansion(project.id),
+        ),
       ),
     );
   }

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'screens/edit_about_screen.dart';
 import 'screens/manage_projects_screen.dart';
+import 'screens/edit_home_screen.dart';
 
 class AdminHomeScreen extends StatelessWidget {
   const AdminHomeScreen({super.key});
@@ -67,6 +68,21 @@ class AdminHomeScreen extends StatelessWidget {
           mainAxisSpacing: 20,
           childAspectRatio: 1.5,
           children: [
+            _buildAdminCard(
+              context,
+              title: 'Edit Home Screen',
+              icon: Icons.home,
+              description:
+                  'Update home heading, paragraph, and featured projects',
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const EditHomeScreen(),
+                  ),
+                );
+              },
+            ),
             _buildAdminCard(
               context,
               title: 'Edit About Section',

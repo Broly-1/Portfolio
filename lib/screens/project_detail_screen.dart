@@ -480,25 +480,6 @@ class ProjectDetailScreen extends StatelessWidget {
     return _MobileScreenPreview(project: project);
   }
 
-  Widget _buildPlaceholder(BuildContext context) {
-    final themeProvider = Provider.of<ThemeProvider>(context);
-    final isLightTheme = themeProvider.selectedTheme != 'Mocha';
-    final placeholderColor = isLightTheme
-        ? Colors.grey[300]!
-        : const Color(0xFF313244);
-
-    return Container(
-      color: placeholderColor,
-      child: Center(
-        child: Icon(
-          Icons.image_outlined,
-          size: 48,
-          color: themeProvider.accentColor.withOpacity(0.5),
-        ),
-      ),
-    );
-  }
-
   Widget _buildDot(Color color) {
     return Container(
       width: 14,

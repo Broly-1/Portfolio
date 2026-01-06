@@ -34,10 +34,6 @@ class _EditProjectScreenState extends State<EditProjectScreen> {
   final TextEditingController _tagController = TextEditingController();
   DateTime? _selectedDate;
 
-  // Rich text formatting state
-  int _selectionStart = 0;
-  int _selectionEnd = 0;
-
   @override
   void initState() {
     super.initState();
@@ -369,14 +365,6 @@ class _EditProjectScreenState extends State<EditProjectScreen> {
                               alignLabelWithHint: true,
                             ),
                             maxLines: 15,
-                            onChanged: (value) {
-                              setState(() {
-                                _selectionStart =
-                                    _contentController.selection.start;
-                                _selectionEnd =
-                                    _contentController.selection.end;
-                              });
-                            },
                           ),
                           const SizedBox(height: 8),
 

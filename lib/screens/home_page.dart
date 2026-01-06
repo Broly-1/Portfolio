@@ -5,6 +5,7 @@ import '../widgets/footer.dart';
 import '../styles/theme_provider.dart';
 import 'about_screen.dart';
 import 'projects_screen.dart';
+import 'home_content_screen.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -15,10 +16,12 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   String currentScreen = '_';
+  String? _expandProjectId;
 
-  void navigateTo(String path) {
+  void navigateTo(String path, {String? projectId}) {
     setState(() {
       currentScreen = path;
+      _expandProjectId = projectId;
     });
   }
 
@@ -40,9 +43,7 @@ class _HomePageState extends State<HomePage> {
   }
 
   Widget _buildHomeContent() {
-    return const Center(
-      child: Text('Welcome to my portfolio', style: TextStyle(fontSize: 24)),
-    );
+    return HomeContentScreen(onNavigate: navigateTo);
   }
 
   Widget _buildAboutContent() {
@@ -69,7 +70,7 @@ class _HomePageState extends State<HomePage> {
   }
 
   Widget _buildProjectsContent() {
-    return const ProjectsScreen();
+    return ProjectsScreen(initialExpandedProjectId: _expandProjectId);
   }
 
   Widget _buildResumeContent() {

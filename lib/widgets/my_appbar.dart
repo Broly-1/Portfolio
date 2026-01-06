@@ -78,7 +78,6 @@ class _NavigationIndicatorState extends State<NavigationIndicator>
         ? const Color.fromARGB(255, 70, 100, 120)
         : const Color.fromARGB(255, 128, 154, 175);
 
-    // Show cursor only when on home (currentPath is '_')
     final isHome = widget.currentPath == '_';
 
     return Padding(
@@ -102,13 +101,19 @@ class _NavigationIndicatorState extends State<NavigationIndicator>
               letterSpacing: 3,
             ),
           ),
-          if (isHome) ...[
-            const SizedBox(width: 4),
-            FadeTransition(
-              opacity: _cursorController,
-              child: Container(width: 10, height: 20, color: accentColor),
+          if (!isHome)
+            Text(
+              '/',
+              style: context.textStyle.titleLgBold.copyWith(
+                color: accentColor,
+                letterSpacing: 3,
+              ),
             ),
-          ],
+          const SizedBox(width: 4),
+          FadeTransition(
+            opacity: _cursorController,
+            child: Container(width: 10, height: 20, color: accentColor),
+          ),
         ],
       ),
     );
@@ -230,7 +235,6 @@ class AppMenus extends StatelessWidget {
 
                       // Navigation menu items
                       _buildMenuItem(context, 'About', 'about', textColor),
-                      _buildMenuItem(context, 'Posts', 'posts', textColor),
                       _buildMenuItem(
                         context,
                         'Projects',
@@ -266,14 +270,29 @@ class AppMenus extends StatelessWidget {
     final isSelected = themeProvider.accentColor == color;
     return InkWell(
       onTap: () => themeProvider.setAccentColor(color),
+      borderRadius: BorderRadius.circular(12),
       child: Container(
-        width: 40,
-        height: 40,
+        width: 44,
+        height: 44,
         decoration: BoxDecoration(
           color: color,
-          borderRadius: BorderRadius.circular(8),
-          border: isSelected ? Border.all(color: Colors.white, width: 3) : null,
+          borderRadius: BorderRadius.circular(12),
+          border: isSelected
+              ? Border.all(color: Colors.white, width: 3)
+              : Border.all(color: Colors.white.withOpacity(0.2), width: 1),
+          boxShadow: isSelected
+              ? [
+                  BoxShadow(
+                    color: color.withOpacity(0.5),
+                    blurRadius: 12,
+                    spreadRadius: 2,
+                  ),
+                ]
+              : null,
         ),
+        child: isSelected
+            ? const Icon(Icons.check, color: Colors.white, size: 22)
+            : null,
       ),
     );
   }

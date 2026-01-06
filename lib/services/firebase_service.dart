@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'dart:io';
 import 'package:hassankamran/models/project.dart';
+import 'package:hassankamran/models/home_content.dart';
 
 class FirebaseService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
@@ -10,6 +11,7 @@ class FirebaseService {
   // Collection references
   static const String _aboutCollection = 'about';
   static const String _projectsCollection = 'projects';
+  static const String _homeContentCollection = 'homeContent';
 
   // Get About data
   Future<Map<String, dynamic>?> getAboutData() async {
@@ -206,6 +208,58 @@ class FirebaseService {
       return true;
     } catch (e) {
       print('❌ Error deleting thumbnail: $e');
+      return false;
+    }
+  }
+
+  // ========== Home Content Methods ==========
+
+  // Stream home content (real-time updates)
+  Stream<HomeContent?> streamHomeContent() {
+    return _firestore
+        .collection(_homeContentCollection)
+        .doc('main')
+        .snapshots()
+        .map((doc) {
+          if (doc.exists) {
+            return HomeContent.fromFirestore(doc.data()!, doc.id);
+          }
+          return null;
+        });
+  }
+
+  // Get home content
+  Future<HomeContent?> getHomeContent() async {
+    try {
+      print('🔍 Fetching home content...');
+      final doc = await _firestore
+          .collection(_homeContentCollection)
+          .doc('main')
+          .get();
+
+      if (doc.exists) {
+        return HomeContent.fromFirestore(doc.data()!, doc.id);
+      }
+      return null;
+    } catch (e) {
+      print('❌ Error getting home content: $e');
+      return null;
+    }
+  }
+
+  // Update home content
+  Future<bool> updateHomeContent(HomeContent content) async {
+    try {
+      print('📝 Updating home content...');
+      await _firestore
+          .collection(_homeContentCollection)
+          .doc('main')
+          .set(content.toFirestore());
+
+      print('✅ Home content updated successfully');
+      return true;
+    } catch (e) {
+      print('❌ Error updating home content: $e');
       return false;
     }
   }
