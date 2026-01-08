@@ -43,7 +43,7 @@ class HomeContentScreen extends StatelessWidget {
           ),
           child: Center(
             child: ConstrainedBox(
-              constraints: const BoxConstraints(maxWidth: 900),
+              constraints: BoxConstraints(maxWidth: screenWidth * 0.7),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -54,7 +54,13 @@ class HomeContentScreen extends StatelessWidget {
                     themeProvider.accentColor,
                   ),
                   const SizedBox(height: 20),
-                  _buildParagraphWithLinks(context, homeContent.paragraph),
+                  ConstrainedBox(
+                    constraints: const BoxConstraints(maxWidth: 700),
+                    child: _buildParagraphWithLinks(
+                      context,
+                      homeContent.paragraph,
+                    ),
+                  ),
                   const SizedBox(height: 32),
 
                   // Action buttons - minimalist icon-only style
@@ -87,53 +93,6 @@ class HomeContentScreen extends StatelessWidget {
 
                   const SizedBox(height: 80),
 
-                  // Featured Projects section - minimalist header
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      Row(
-                        children: [
-                          Icon(
-                            Icons.star_border,
-                            size: 18,
-                            color: themeProvider.accentColor,
-                          ),
-                          const SizedBox(width: 8),
-                          Text(
-                            'Featured Projects',
-                            style: TextStyle(
-                              fontWeight: FontWeight.w600,
-                              fontSize: 16,
-                            ),
-                          ),
-                        ],
-                      ),
-                      InkWell(
-                        onTap: () => onNavigate('projects'),
-                        child: Row(
-                          children: [
-                            Text(
-                              'View all',
-                              style: TextStyle(
-                                color: themeProvider.accentColor,
-                                fontSize: 13,
-                              ),
-                            ),
-                            const SizedBox(width: 4),
-                            Icon(
-                              Icons.arrow_forward,
-                              color: themeProvider.accentColor,
-                              size: 14,
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-
-                  const SizedBox(height: 32),
-
                   // Featured projects grid
                   StreamBuilder<List<Project>>(
                     stream: firebaseService.streamProjects(),
@@ -164,27 +123,86 @@ class HomeContentScreen extends StatelessWidget {
                       return LayoutBuilder(
                         builder: (context, constraints) {
                           final spacing = 20.0;
-                          // Scale down cards on home screen - show single column
                           final cardWidth = constraints.maxWidth.clamp(
                             300.0,
                             600.0,
                           );
+                          final canFitTwo =
+                              constraints.maxWidth >= (cardWidth * 2 + spacing);
 
-                          return Wrap(
-                            spacing: spacing,
-                            runSpacing: spacing,
-                            children: featuredProjects.map((project) {
-                              return SizedBox(
-                                width: cardWidth,
-                                child: ProjectCard(
-                                  project: project,
-                                  onTap: () => onNavigate(
-                                    'projects',
-                                    projectId: project.id,
+                          return Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              // Featured Projects header with View all button
+                              Row(
+                                children: [
+                                  Icon(
+                                    Icons.star_border,
+                                    size: 24,
+                                    color: themeProvider.accentColor,
                                   ),
-                                ),
-                              );
-                            }).toList(),
+                                  const SizedBox(width: 10),
+                                  Text(
+                                    'Featured Projects',
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.w600,
+                                      fontSize: 22,
+                                      letterSpacing: 1.6,
+                                    ),
+                                  ),
+                                  const Spacer(),
+                                  if (canFitTwo)
+                                    Padding(
+                                      padding: EdgeInsets.only(
+                                        right:
+                                            constraints.maxWidth -
+                                            (cardWidth * 2 + spacing),
+                                      ),
+                                      child: InkWell(
+                                        onTap: () => onNavigate('projects'),
+                                        child: Row(
+                                          mainAxisSize: MainAxisSize.min,
+                                          children: [
+                                            Text(
+                                              'View all',
+                                              style: TextStyle(
+                                                color:
+                                                    themeProvider.accentColor,
+                                                fontSize: 18,
+                                                letterSpacing: 1.6,
+                                              ),
+                                            ),
+                                            const SizedBox(width: 6),
+                                            Icon(
+                                              Icons.arrow_forward,
+                                              color: themeProvider.accentColor,
+                                              size: 18,
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+                                ],
+                              ),
+                              const SizedBox(height: 32),
+                              // Project cards
+                              Wrap(
+                                spacing: spacing,
+                                runSpacing: spacing,
+                                children: featuredProjects.map((project) {
+                                  return SizedBox(
+                                    width: cardWidth,
+                                    child: ProjectCard(
+                                      project: project,
+                                      onTap: () => onNavigate(
+                                        'projects',
+                                        projectId: project.id,
+                                      ),
+                                    ),
+                                  );
+                                }).toList(),
+                              ),
+                            ],
                           );
                         },
                       );
@@ -272,7 +290,8 @@ class HomeContentScreen extends StatelessWidget {
           fontSize: 36,
           fontWeight: FontWeight.w600,
           height: 1.2,
-          letterSpacing: -0.5,
+          letterSpacing: 1.6,
+          color: Colors.white,
         ),
       );
     }
@@ -290,7 +309,8 @@ class HomeContentScreen extends StatelessWidget {
               fontSize: 36,
               fontWeight: FontWeight.w600,
               height: 1.2,
-              letterSpacing: -0.5,
+              letterSpacing: 1.6,
+              color: Colors.white,
             ),
           ),
         );
@@ -304,7 +324,7 @@ class HomeContentScreen extends StatelessWidget {
             fontSize: 36,
             fontWeight: FontWeight.w600,
             height: 1.2,
-            letterSpacing: -0.5,
+            letterSpacing: 1.6,
             color: accentColor,
           ),
         ),
@@ -319,15 +339,20 @@ class HomeContentScreen extends StatelessWidget {
         TextSpan(
           text: heading.substring(lastIndex),
           style: const TextStyle(
-            fontSize: 32,
+            fontSize: 36,
             fontWeight: FontWeight.w600,
-            height: 1.3,
+            height: 1.2,
+            letterSpacing: 1.6,
+            color: Colors.white,
           ),
         ),
       );
     }
 
-    return RichText(text: TextSpan(children: spans));
+    return RichText(
+      textAlign: TextAlign.justify,
+      text: TextSpan(children: spans),
+    );
   }
 
   // Parse paragraph and make [text](url) clickable
@@ -339,9 +364,11 @@ class HomeContentScreen extends StatelessWidget {
       // No links, return plain text
       return Text(
         paragraph,
+        textAlign: TextAlign.justify,
         style: const TextStyle(
-          fontSize: 16,
-          height: 1.5,
+          fontSize: 18,
+          height: 1.6,
+          letterSpacing: 1.3,
           color: Color(0xFFB4B8C5),
         ),
       );
@@ -357,8 +384,9 @@ class HomeContentScreen extends StatelessWidget {
           TextSpan(
             text: paragraph.substring(lastIndex, match.start),
             style: const TextStyle(
-              fontSize: 16,
-              height: 1.5,
+              fontSize: 18,
+              height: 1.6,
+              letterSpacing: 1.3,
               color: Color(0xFFB4B8C5),
             ),
           ),
@@ -378,8 +406,9 @@ class HomeContentScreen extends StatelessWidget {
               child: Text(
                 linkText,
                 style: TextStyle(
-                  fontSize: 16,
-                  height: 1.5,
+                  fontSize: 18,
+                  height: 1.6,
+                  letterSpacing: 1.3,
                   color: Provider.of<ThemeProvider>(
                     context,
                     listen: false,
@@ -401,8 +430,9 @@ class HomeContentScreen extends StatelessWidget {
         TextSpan(
           text: paragraph.substring(lastIndex),
           style: const TextStyle(
-            fontSize: 16,
-            height: 1.5,
+            fontSize: 18,
+            height: 1.6,
+            letterSpacing: 1.3,
             color: Color(0xFFB4B8C5),
           ),
         ),

@@ -154,44 +154,47 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
                             )
                               Padding(
                                 padding: EdgeInsets.only(bottom: spacing),
-                                child: Row(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    for (
-                                      int j = 0;
-                                      j < crossAxisCount &&
-                                          i + j < projects.length;
-                                      j++
-                                    )
-                                      Expanded(
-                                        child: Padding(
-                                          padding: EdgeInsets.only(
-                                            right: j < crossAxisCount - 1
-                                                ? spacing
-                                                : 0,
-                                          ),
-                                          child: ProjectCard(
-                                            project: projects[i + j],
-                                            onTap: () =>
-                                                _toggleProjectExpansion(
-                                                  projects[i + j].id,
-                                                ),
+                                child: IntrinsicHeight(
+                                  child: Row(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.stretch,
+                                    children: [
+                                      for (
+                                        int j = 0;
+                                        j < crossAxisCount &&
+                                            i + j < projects.length;
+                                        j++
+                                      )
+                                        Expanded(
+                                          child: Padding(
+                                            padding: EdgeInsets.only(
+                                              right: j < crossAxisCount - 1
+                                                  ? spacing
+                                                  : 0,
+                                            ),
+                                            child: ProjectCard(
+                                              project: projects[i + j],
+                                              onTap: () =>
+                                                  _toggleProjectExpansion(
+                                                    projects[i + j].id,
+                                                  ),
+                                            ),
                                           ),
                                         ),
-                                      ),
-                                    // Fill remaining space if last row is incomplete
-                                    for (
-                                      int k = 0;
-                                      k <
-                                          crossAxisCount -
-                                              ((projects.length - i).clamp(
-                                                0,
-                                                crossAxisCount,
-                                              ));
-                                      k++
-                                    )
-                                      Expanded(child: SizedBox()),
-                                  ],
+                                      // Fill remaining space if last row is incomplete
+                                      for (
+                                        int k = 0;
+                                        k <
+                                            crossAxisCount -
+                                                ((projects.length - i).clamp(
+                                                  0,
+                                                  crossAxisCount,
+                                                ));
+                                        k++
+                                      )
+                                        Expanded(child: SizedBox()),
+                                    ],
+                                  ),
                                 ),
                               ),
                           ],

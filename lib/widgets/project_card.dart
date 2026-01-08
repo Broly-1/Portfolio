@@ -156,12 +156,20 @@ class _ProjectCardState extends State<ProjectCard> {
                         ),
                       ),
                       const SizedBox(height: 8),
-                      // Description in browser
-                      Text(
-                        widget.project.description,
-                        style: TextStyle(fontSize: 11, color: Colors.grey[400]),
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
+                      // Description in browser - fixed height for consistency
+                      SizedBox(
+                        height:
+                            33, // Fixed height for exactly 2 lines (11px font * 1.5 line height * 2 lines)
+                        child: Text(
+                          widget.project.description,
+                          style: TextStyle(
+                            fontSize: 11,
+                            color: Colors.grey[400],
+                            height: 1.5,
+                          ),
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                        ),
                       ),
                       const SizedBox(height: 12),
                       // GitHub profile
@@ -218,13 +226,24 @@ class _ProjectCardState extends State<ProjectCard> {
                 overflow: TextOverflow.ellipsis,
               ),
             ),
-            Text(
-              dateStr,
-              style: TextStyle(
-                fontSize: 11,
-                color: textColor.withOpacity(0.5),
-                letterSpacing: 1.6,
-              ),
+            Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(
+                  Icons.calendar_today,
+                  size: 11,
+                  color: textColor.withOpacity(0.5),
+                ),
+                const SizedBox(width: 4),
+                Text(
+                  dateStr,
+                  style: TextStyle(
+                    fontSize: 11,
+                    color: textColor.withOpacity(0.5),
+                    letterSpacing: 1.6,
+                  ),
+                ),
+              ],
             ),
           ],
         ),

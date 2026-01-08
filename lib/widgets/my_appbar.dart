@@ -74,9 +74,7 @@ class _NavigationIndicatorState extends State<NavigationIndicator>
     final themeProvider = Provider.of<ThemeProvider>(context);
     final isLightTheme = themeProvider.selectedTheme != 'Mocha';
     final textColor = isLightTheme ? Colors.black87 : Colors.white;
-    final accentColor = isLightTheme
-        ? const Color.fromARGB(255, 70, 100, 120)
-        : const Color.fromARGB(255, 128, 154, 175);
+    final accentColor = themeProvider.accentColor;
 
     final isHome = widget.currentPath == '_';
 

@@ -90,8 +90,23 @@ class _HomePageState extends State<HomePage> {
           body: Column(
             children: [
               MyAppbar(currentPath: currentScreen, onNavigate: navigateTo),
-              Expanded(child: _buildCurrentScreen()),
-              const Footer(),
+              Expanded(
+                child: LayoutBuilder(
+                  builder: (context, constraints) {
+                    return SingleChildScrollView(
+                      child: ConstrainedBox(
+                        constraints: BoxConstraints(
+                          minHeight: constraints.maxHeight,
+                        ),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [_buildCurrentScreen(), const Footer()],
+                        ),
+                      ),
+                    );
+                  },
+                ),
+              ),
             ],
           ),
         );

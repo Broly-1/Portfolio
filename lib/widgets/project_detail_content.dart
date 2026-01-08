@@ -116,31 +116,50 @@ class _ProjectDetailContentState extends State<ProjectDetailContent> {
 
         // Tags
         if (widget.project.tags.isNotEmpty) ...[
-          Wrap(
-            spacing: 8,
-            runSpacing: 8,
-            children: widget.project.tags.map((tag) {
-              return Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 12,
-                  vertical: 6,
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Padding(
+                padding: const EdgeInsets.only(top: 6, right: 8),
+                child: Icon(
+                  Icons.local_offer,
+                  size: 16,
+                  color: themeProvider.accentColor.withOpacity(0.7),
                 ),
-                decoration: BoxDecoration(
-                  color: isLightTheme
-                      ? Colors.black.withOpacity(0.08)
-                      : Colors.white.withOpacity(0.1),
-                  borderRadius: BorderRadius.circular(6),
+              ),
+              Expanded(
+                child: Wrap(
+                  spacing: 8,
+                  runSpacing: 8,
+                  children: widget.project.tags.map((tag) {
+                    final tagColor = _getTagColor(tag);
+                    return Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 6,
+                      ),
+                      decoration: BoxDecoration(
+                        color: tagColor.withOpacity(0.15),
+                        borderRadius: BorderRadius.circular(16),
+                        border: Border.all(
+                          color: tagColor.withOpacity(0.3),
+                          width: 1,
+                        ),
+                      ),
+                      child: Text(
+                        tag,
+                        style: TextStyle(
+                          fontSize: 13,
+                          color: tagColor,
+                          fontWeight: FontWeight.w600,
+                          letterSpacing: 0.3,
+                        ),
+                      ),
+                    );
+                  }).toList(),
                 ),
-                child: Text(
-                  tag,
-                  style: TextStyle(
-                    fontSize: 12,
-                    color: _getTagColor(tag),
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-              );
-            }).toList(),
+              ),
+            ],
           ),
           const SizedBox(height: 32),
         ],
@@ -489,18 +508,67 @@ class _ProjectDetailContentState extends State<ProjectDetailContent> {
   Widget _buildProjectContent(BuildContext context) {
     final themeProvider = Provider.of<ThemeProvider>(context);
     final isLightTheme = themeProvider.selectedTheme != 'Mocha';
+    final textColor = isLightTheme ? Colors.grey[800]! : Colors.grey[300]!;
+    final headingColor = isLightTheme ? Colors.grey[900]! : Colors.grey[100]!;
 
     return MarkdownBody(
       data: widget.project.content,
       selectable: true,
       styleSheet: MarkdownStyleSheet(
-        p: Theme.of(context).textTheme.bodyMedium,
-        h1: Theme.of(context).textTheme.headlineLarge,
-        h2: Theme.of(context).textTheme.headlineMedium,
-        h3: Theme.of(context).textTheme.headlineSmall,
+        p: TextStyle(
+          fontSize: 16,
+          height: 1.6,
+          letterSpacing: 0.3,
+          color: textColor,
+        ),
+        h1: TextStyle(
+          fontSize: 32,
+          fontWeight: FontWeight.bold,
+          height: 1.3,
+          letterSpacing: 1.0,
+          color: headingColor,
+        ),
+        h2: TextStyle(
+          fontSize: 24,
+          fontWeight: FontWeight.bold,
+          height: 1.4,
+          letterSpacing: 0.8,
+          color: headingColor,
+        ),
+        h3: TextStyle(
+          fontSize: 20,
+          fontWeight: FontWeight.w600,
+          height: 1.4,
+          letterSpacing: 0.5,
+          color: headingColor,
+        ),
+        h4: TextStyle(
+          fontSize: 18,
+          fontWeight: FontWeight.w600,
+          height: 1.4,
+          color: headingColor,
+        ),
+        strong: TextStyle(fontWeight: FontWeight.bold, color: headingColor),
+        em: TextStyle(fontStyle: FontStyle.italic, color: textColor),
+        a: TextStyle(
+          color: themeProvider.accentColor,
+          decoration: TextDecoration.underline,
+        ),
         code: TextStyle(
           backgroundColor: isLightTheme ? Colors.grey[200] : Colors.grey[800],
           fontFamily: 'monospace',
+          fontSize: 14,
+          color: themeProvider.accentColor,
+        ),
+        listBullet: TextStyle(color: themeProvider.accentColor, fontSize: 16),
+        listIndent: 24,
+        blockquotePadding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        blockquoteDecoration: BoxDecoration(
+          color: isLightTheme ? Colors.grey[100] : Colors.grey[900],
+          borderRadius: BorderRadius.circular(4),
+          border: Border(
+            left: BorderSide(color: themeProvider.accentColor, width: 4),
+          ),
         ),
       ),
       onTapLink: (text, href, title) {
@@ -523,25 +591,16 @@ class _ProjectDetailContentState extends State<ProjectDetailContent> {
   }
 
   Color _getTagColor(String tag) {
-    final tagLower = tag.toLowerCase();
-    if (tagLower.contains('flutter') || tagLower.contains('dart')) {
-      return const Color(0xFF0175C2);
-    } else if (tagLower.contains('firebase')) {
-      return const Color(0xFFFFA000);
-    } else if (tagLower.contains('android')) {
-      return const Color(0xFF3DDC84);
-    } else if (tagLower.contains('ios') || tagLower.contains('swift')) {
-      return const Color(0xFFFA7343);
-    } else if (tagLower.contains('web')) {
-      return const Color(0xFF2196F3);
-    } else if (tagLower.contains('api') || tagLower.contains('rest')) {
-      return const Color(0xFF4CAF50);
-    } else if (tagLower.contains('ui') || tagLower.contains('ux')) {
-      return const Color(0xFFE91E63);
-    } else if (tagLower.contains('database') || tagLower.contains('sql')) {
-      return const Color(0xFF9C27B0);
-    } else {
-      return const Color(0xFF607D8B);
-    }
+    final colors = [
+      const Color(0xFFF38BA8), // Pink
+      const Color(0xFFF9E2AF), // Yellow
+      const Color(0xFFA6E3A1), // Green
+      const Color(0xFF89DCEB), // Sky blue (lighter)
+      const Color(0xFFCBA6F7), // Purple
+      const Color(0xFFF5C2E7), // Light pink
+      const Color(0xFF94E2D5), // Teal
+      const Color(0xFFFAB387), // Peach
+    ];
+    return colors[tag.hashCode.abs() % colors.length];
   }
 }
