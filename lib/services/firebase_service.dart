@@ -45,6 +45,20 @@ class FirebaseService {
         .map((doc) => doc.exists ? doc.data() : null);
   }
 
+  // Get Resume URL
+  Future<String?> getResumeUrl() async {
+    try {
+      final doc = await _firestore.collection('resume').doc('main').get();
+      if (doc.exists) {
+        return doc.data()?['url'] as String?;
+      }
+      return null;
+    } catch (e) {
+      print('❌ Error getting resume URL: $e');
+      return null;
+    }
+  }
+
   // Analytics methods
   Future<void> incrementViewCount() async {
     try {

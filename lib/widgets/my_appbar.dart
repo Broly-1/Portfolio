@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:hassankamran/Extensions/extensions.dart';
 import 'package:provider/provider.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../styles/theme_provider.dart';
+import '../services/firebase_service.dart';
 
 class MyAppbar extends StatelessWidget {
   final String currentPath;
@@ -16,11 +18,12 @@ class MyAppbar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isMobile = context.isMobile;
+    final scale = context.responsiveScale;
 
     return Padding(
       padding: EdgeInsets.symmetric(
-        horizontal: isMobile ? 16.0 : 300.0,
-        vertical: isMobile ? 8.0 : 16.0,
+        horizontal: isMobile ? 16.0 : 300.0 * scale,
+        vertical: isMobile ? 8.0 : 16.0 * scale,
       ),
       child: Row(
         children: [
@@ -75,42 +78,58 @@ class _NavigationIndicatorState extends State<NavigationIndicator>
     final isLightTheme = themeProvider.selectedTheme != 'Mocha';
     final textColor = isLightTheme ? Colors.black87 : Colors.white;
     final accentColor = themeProvider.accentColor;
+    final scale = context.responsiveScale;
+    final isMobile = context.isMobile;
 
     final isHome = widget.currentPath == '_';
 
+    // Use smaller font size on mobile to prevent overflow
+    final fontSize = isMobile ? 14.0 : 18.0;
+    final letterSpacing = isMobile ? 1.5 : 3.0;
+
     return Padding(
-      padding: const EdgeInsets.all(16.0),
+      padding: EdgeInsets.all(16.0 * scale),
       child: Row(
         children: [
           InkWell(
             onTap: widget.onHomePressed,
             child: Text(
               '~',
-              style: context.textStyle.titleLgBold.copyWith(
-                letterSpacing: 3,
+              style: TextStyle(
+                fontSize: fontSize,
+                fontWeight: FontWeight.bold,
+                letterSpacing: letterSpacing,
                 color: textColor,
               ),
             ),
           ),
           Text(
             isHome ? '/' : '/${widget.currentPath}',
-            style: context.textStyle.titleLgBold.copyWith(
+            style: TextStyle(
+              fontSize: fontSize,
+              fontWeight: FontWeight.bold,
               color: accentColor,
-              letterSpacing: 3,
+              letterSpacing: letterSpacing,
             ),
           ),
           if (!isHome)
             Text(
               '/',
-              style: context.textStyle.titleLgBold.copyWith(
+              style: TextStyle(
+                fontSize: fontSize,
+                fontWeight: FontWeight.bold,
                 color: accentColor,
-                letterSpacing: 3,
+                letterSpacing: letterSpacing,
               ),
             ),
           const SizedBox(width: 4),
           FadeTransition(
             opacity: _cursorController,
-            child: Container(width: 10, height: 20, color: accentColor),
+            child: Container(
+              width: isMobile ? 8 : 10 * scale,
+              height: isMobile ? 16 : 20 * scale,
+              color: accentColor,
+            ),
           ),
         ],
       ),
@@ -158,9 +177,9 @@ class AppMenus extends StatelessWidget {
               child: Material(
                 color: drawerColor,
                 child: Container(
-                  width:
-                      MediaQuery.of(context).size.width *
-                      (isMobile ? 0.6 : 0.18),
+                  width: isMobile
+                      ? MediaQuery.of(context).size.width * 0.6
+                      : 280,
                   height: double.infinity,
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -174,7 +193,7 @@ class AppMenus extends StatelessWidget {
                             Text(
                               'Navigation',
                               style: TextStyle(
-                                fontSize: 24,
+                                fontSize: 19,
                                 fontWeight: FontWeight.bold,
                                 color: textColor,
                               ),
@@ -190,39 +209,131 @@ class AppMenus extends StatelessWidget {
 
                       // Accent colors
                       Padding(
-                        padding: const EdgeInsets.all(16.0),
+                        padding: const EdgeInsets.all(13.0),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Row(
                               children: [
-                                Icon(Icons.palette, color: iconColor, size: 20),
-                                const SizedBox(width: 8),
+                                Icon(Icons.palette, color: iconColor, size: 16),
+                                const SizedBox(width: 6),
                                 Text(
                                   'Accent Color',
                                   style: TextStyle(
-                                    fontSize: 18,
+                                    fontSize: 14,
                                     fontWeight: FontWeight.bold,
                                     color: textColor,
                                   ),
                                 ),
                               ],
                             ),
-                            const SizedBox(height: 16),
+                            const SizedBox(height: 13),
                             Consumer<ThemeProvider>(
                               builder: (context, themeProvider, child) {
-                                return Wrap(
-                                  spacing: 8,
-                                  runSpacing: 8,
-                                  children: ThemeProvider.accentColors
-                                      .map(
-                                        (color) => _buildColorButton(
-                                          context,
-                                          color,
-                                          themeProvider,
+                                return LayoutBuilder(
+                                  builder: (context, constraints) {
+                                    const itemSize = 35.0;
+                                    const spacing = 6.0;
+                                    final itemsPerRow =
+                                        ((constraints.maxWidth + spacing) /
+                                                (itemSize + spacing))
+                                            .floor();
+                                    final selectedIndex = ThemeProvider
+                                        .accentColors
+                                        .indexOf(themeProvider.accentColor);
+                                    final totalItems =
+                                        ThemeProvider.accentColors.length;
+
+                                    // Calculate position of selected item
+                                    final row = selectedIndex ~/ itemsPerRow;
+                                    final col = selectedIndex % itemsPerRow;
+
+                                    // Calculate if this is the last row and how many items it has
+                                    final itemsInLastRow =
+                                        totalItems % itemsPerRow;
+                                    final isLastRow =
+                                        row ==
+                                        (totalItems / itemsPerRow).floor();
+                                    final itemsInCurrentRow =
+                                        isLastRow && itemsInLastRow > 0
+                                        ? itemsInLastRow
+                                        : itemsPerRow;
+
+                                    // Calculate centering offset for incomplete rows
+                                    final rowWidth =
+                                        itemsInCurrentRow * itemSize +
+                                        (itemsInCurrentRow - 1) * spacing;
+                                    final maxRowWidth =
+                                        itemsPerRow * itemSize +
+                                        (itemsPerRow - 1) * spacing;
+                                    final rowOffset =
+                                        (maxRowWidth - rowWidth) / 2;
+
+                                    final left =
+                                        rowOffset + col * (itemSize + spacing);
+                                    final top = row * (itemSize + spacing);
+
+                                    return Stack(
+                                      children: [
+                                        // Animated border that travels between colors
+                                        AnimatedPositioned(
+                                          duration: const Duration(
+                                            milliseconds: 300,
+                                          ),
+                                          curve: Curves.easeInOut,
+                                          left: left,
+                                          top: top,
+                                          child: Container(
+                                            width: itemSize,
+                                            height: itemSize,
+                                            decoration: BoxDecoration(
+                                              borderRadius:
+                                                  BorderRadius.circular(10),
+                                              border: Border.all(
+                                                color: Colors.white,
+                                                width: 3,
+                                              ),
+                                              boxShadow: [
+                                                BoxShadow(
+                                                  color: themeProvider
+                                                      .accentColor
+                                                      .withOpacity(0.5),
+                                                  blurRadius: 12,
+                                                  spreadRadius: 2,
+                                                ),
+                                              ],
+                                            ),
+                                          ),
                                         ),
-                                      )
-                                      .toList(),
+                                        // Color grid
+                                        Wrap(
+                                          spacing: spacing,
+                                          runSpacing: spacing,
+                                          children: ThemeProvider.accentColors
+                                              .map((color) {
+                                                return InkWell(
+                                                  onTap: () => themeProvider
+                                                      .setAccentColor(color),
+                                                  borderRadius:
+                                                      BorderRadius.circular(12),
+                                                  child: Container(
+                                                    width: itemSize,
+                                                    height: itemSize,
+                                                    decoration: BoxDecoration(
+                                                      color: color,
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                            10,
+                                                          ),
+                                                    ),
+                                                  ),
+                                                );
+                                              })
+                                              .toList(),
+                                        ),
+                                      ],
+                                    );
+                                  },
                                 );
                               },
                             ),
@@ -260,41 +371,6 @@ class AppMenus extends StatelessWidget {
     );
   }
 
-  Widget _buildColorButton(
-    BuildContext context,
-    Color color,
-    ThemeProvider themeProvider,
-  ) {
-    final isSelected = themeProvider.accentColor == color;
-    return InkWell(
-      onTap: () => themeProvider.setAccentColor(color),
-      borderRadius: BorderRadius.circular(12),
-      child: Container(
-        width: 44,
-        height: 44,
-        decoration: BoxDecoration(
-          color: color,
-          borderRadius: BorderRadius.circular(12),
-          border: isSelected
-              ? Border.all(color: Colors.white, width: 3)
-              : Border.all(color: Colors.white.withOpacity(0.2), width: 1),
-          boxShadow: isSelected
-              ? [
-                  BoxShadow(
-                    color: color.withOpacity(0.5),
-                    blurRadius: 12,
-                    spreadRadius: 2,
-                  ),
-                ]
-              : null,
-        ),
-        child: isSelected
-            ? const Icon(Icons.check, color: Colors.white, size: 22)
-            : null,
-      ),
-    );
-  }
-
   Widget _buildMenuItem(
     BuildContext context,
     String label,
@@ -304,13 +380,43 @@ class AppMenus extends StatelessWidget {
     return ListTile(
       title: Text(
         label,
-        style: TextStyle(color: textColor, fontSize: 18, letterSpacing: 1),
+        style: TextStyle(color: textColor, fontSize: 14, letterSpacing: 0.8),
       ),
-      onTap: () {
+      onTap: () async {
         Navigator.pop(context);
-        onNavigate(route);
+
+        if (route == 'resume') {
+          // Download resume instead of navigating
+          await _downloadResume(context);
+        } else {
+          onNavigate(route);
+        }
       },
     );
+  }
+
+  Future<void> _downloadResume(BuildContext context) async {
+    try {
+      final firebaseService = FirebaseService();
+      final resumeUrl = await firebaseService.getResumeUrl();
+
+      if (resumeUrl != null) {
+        final uri = Uri.parse(resumeUrl);
+        if (await canLaunchUrl(uri)) {
+          await launchUrl(uri, mode: LaunchMode.externalApplication);
+        } else {
+          throw Exception('Could not open resume');
+        }
+      } else {
+        throw Exception('Resume not available');
+      }
+    } catch (e) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error: $e'), backgroundColor: Colors.red),
+        );
+      }
+    }
   }
 
   @override
@@ -318,6 +424,7 @@ class AppMenus extends StatelessWidget {
     final themeProvider = Provider.of<ThemeProvider>(context);
     final isLightTheme = themeProvider.selectedTheme != 'Mocha';
     final textColor = isLightTheme ? Colors.black87 : Colors.white;
+    final scale = context.responsiveScale;
 
     return context.isMobile
         ? IconButton(
@@ -333,21 +440,21 @@ class AppMenus extends StatelessWidget {
                 hoverColor: themeProvider.accentColor,
                 onPressed: () => onNavigate('about'),
               ),
-              const SizedBox(width: 16),
+              SizedBox(width: 16 * scale),
               _HoverTextButton(
                 label: 'Projects',
                 textColor: textColor,
                 hoverColor: themeProvider.accentColor,
                 onPressed: () => onNavigate('projects'),
               ),
-              const SizedBox(width: 16),
+              SizedBox(width: 16 * scale),
               _HoverTextButton(
                 label: 'Resume',
                 textColor: textColor,
                 hoverColor: themeProvider.accentColor,
-                onPressed: () => onNavigate('resume'),
+                onPressed: () => _downloadResume(context),
               ),
-              const SizedBox(width: 16),
+              SizedBox(width: 16 * scale),
               _HoverTextButton(
                 label: 'More...',
                 textColor: textColor,
@@ -384,6 +491,7 @@ class _HoverTextButtonState extends State<_HoverTextButton> {
 
   @override
   Widget build(BuildContext context) {
+    final scale = context.responsiveScale;
     return MouseRegion(
       onEnter: (_) => setState(() => _isHovering = true),
       onExit: (_) => setState(() => _isHovering = false),
@@ -391,14 +499,17 @@ class _HoverTextButtonState extends State<_HoverTextButton> {
       child: TextButton(
         onPressed: widget.onPressed,
         style: TextButton.styleFrom(
-          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+          padding: EdgeInsets.symmetric(
+            horizontal: 20 * scale,
+            vertical: 16 * scale,
+          ),
           overlayColor: Colors.transparent,
           splashFactory: NoSplash.splashFactory,
         ),
         child: Text(
           widget.label,
           style: context.textStyle.bodyLgMedium.copyWith(
-            letterSpacing: widget.letterSpacing,
+            letterSpacing: widget.letterSpacing * scale,
             color: _isHovering ? widget.hoverColor : widget.textColor,
           ),
         ),

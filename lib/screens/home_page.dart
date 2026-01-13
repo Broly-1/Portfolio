@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:hassankamran/Extensions/extensions.dart';
 import '../widgets/my_appbar.dart';
 import '../widgets/footer.dart';
 import '../styles/theme_provider.dart';
@@ -50,15 +51,16 @@ class _HomePageState extends State<HomePage> {
     final screenWidth = MediaQuery.of(context).size.width;
     final isMobile = screenWidth < 600;
     final isTablet = screenWidth >= 600 && screenWidth < 1200;
+    final scale = context.responsiveScale;
 
     return SingleChildScrollView(
       padding: EdgeInsets.symmetric(
-        horizontal: isMobile ? 16 : (isTablet ? 40 : 200),
-        vertical: isMobile ? 20 : 40,
+        horizontal: isMobile ? 16 : (isTablet ? 40 * scale : 200 * scale),
+        vertical: isMobile ? 20 : 40 * scale,
       ),
       child: Center(
         child: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: 1400),
+          constraints: BoxConstraints(maxWidth: 1400 * scale),
           child: const AboutContent(),
         ),
       ),
@@ -87,30 +89,31 @@ class _HomePageState extends State<HomePage> {
       builder: (context, themeProvider, child) {
         return Scaffold(
           backgroundColor: themeProvider.themeBackgroundColor,
-          body: Column(
-            children: [
-              MyAppbar(currentPath: currentScreen, onNavigate: navigateTo),
-              Expanded(
-                child: LayoutBuilder(
-                  builder: (context, constraints) {
-                    return SingleChildScrollView(
-                      child: ConstrainedBox(
-                        constraints: BoxConstraints(
-                          minHeight: constraints.maxHeight,
-                        ),
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [_buildCurrentScreen(), const Footer()],
-                        ),
-                      ),
-                    );
-                  },
-                ),
-              ),
-            ],
-          ),
+          body: child,
         );
       },
+      child: Column(
+        children: [
+          MyAppbar(currentPath: currentScreen, onNavigate: navigateTo),
+          Expanded(
+            child: LayoutBuilder(
+              builder: (context, constraints) {
+                return SingleChildScrollView(
+                  child: ConstrainedBox(
+                    constraints: BoxConstraints(
+                      minHeight: constraints.maxHeight,
+                    ),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [_buildCurrentScreen(), const Footer()],
+                    ),
+                  ),
+                );
+              },
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

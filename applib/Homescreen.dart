@@ -3,6 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'screens/edit_about_screen.dart';
 import 'screens/manage_projects_screen.dart';
 import 'screens/edit_home_screen.dart';
+import 'screens/edit_resume_screen.dart';
 
 class AdminHomeScreen extends StatelessWidget {
   const AdminHomeScreen({super.key});
@@ -107,6 +108,20 @@ class AdminHomeScreen extends StatelessWidget {
                   context,
                   MaterialPageRoute(
                     builder: (context) => const ManageProjectsScreen(),
+                  ),
+                );
+              },
+            ),
+            _buildAdminCard(
+              context,
+              title: 'Resume',
+              icon: Icons.picture_as_pdf,
+              description: 'Upload and manage resume PDF',
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const EditResumeScreen(),
                   ),
                 );
               },

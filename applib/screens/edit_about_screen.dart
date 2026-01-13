@@ -92,7 +92,7 @@ class _EditAboutScreenState extends State<EditAboutScreen> {
       if (_selectedImage != null) {
         imageUrl = await _firebaseService.uploadImage(
           File(_selectedImage!.path),
-          'about',
+          'profile',
         );
       }
 

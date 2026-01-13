@@ -5,6 +5,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:ui';
 import 'package:http/http.dart' as http;
+import 'package:hassankamran/Extensions/extensions.dart';
 import '../styles/theme_provider.dart';
 import '../services/firebase_service.dart';
 
@@ -177,6 +178,7 @@ class _FooterState extends State<Footer> with SingleTickerProviderStateMixin {
     final themeProvider = Provider.of<ThemeProvider>(context);
     final isLightTheme = themeProvider.selectedTheme != 'Mocha';
     final textColor = isLightTheme ? Colors.black87 : Colors.grey[300]!;
+    final scale = context.responsiveScale;
 
     // Make dock darker than theme background
     final baseColor = themeProvider.themeBackgroundColor;
@@ -192,14 +194,14 @@ class _FooterState extends State<Footer> with SingleTickerProviderStateMixin {
     return Center(
       child: Container(
         width: isMobile ? null : screenWidth * 0.7,
-        margin: const EdgeInsets.only(bottom: 20),
+        margin: EdgeInsets.only(bottom: 20 * scale),
         padding: EdgeInsets.symmetric(
-          horizontal: isMobile ? 20 : 32,
-          vertical: 30,
+          horizontal: isMobile ? 20 : 32 * scale,
+          vertical: 30 * scale,
         ),
         decoration: BoxDecoration(
           color: backgroundColor,
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(16 * scale),
           border: Border.all(
             color: isLightTheme ? Colors.grey[300]! : Colors.grey[800]!,
             width: 1,
@@ -207,19 +209,19 @@ class _FooterState extends State<Footer> with SingleTickerProviderStateMixin {
           boxShadow: [
             BoxShadow(
               color: Colors.black.withOpacity(0.15),
-              blurRadius: 15,
-              offset: const Offset(0, 5),
+              blurRadius: 15 * scale,
+              offset: Offset(0, 5 * scale),
             ),
           ],
         ),
         child: isMobile
             ? _buildMobileFooter(textColor)
-            : _buildDesktopFooter(textColor),
+            : _buildDesktopFooter(textColor, scale),
       ),
     );
   }
 
-  Widget _buildDesktopFooter(Color textColor) {
+  Widget _buildDesktopFooter(Color textColor, double scale) {
     final themeProvider = Provider.of<ThemeProvider>(context);
 
     return Row(
@@ -227,10 +229,14 @@ class _FooterState extends State<Footer> with SingleTickerProviderStateMixin {
         // Left - Copyright
         Text(
           '© 2026 Hassan Kamran',
-          style: TextStyle(color: textColor, fontSize: 18, letterSpacing: 1.6),
+          style: TextStyle(
+            color: textColor,
+            fontSize: 18 * scale,
+            letterSpacing: 1.6 * scale,
+          ),
         ),
 
-        const SizedBox(width: 40),
+        SizedBox(width: 40 * scale),
 
         // Center - Green dot + All Services Nominal
         Row(
@@ -240,29 +246,29 @@ class _FooterState extends State<Footer> with SingleTickerProviderStateMixin {
               animation: _glowAnimation,
               builder: (context, child) {
                 return Container(
-                  width: 8,
-                  height: 8,
+                  width: 8 * scale,
+                  height: 8 * scale,
                   decoration: BoxDecoration(
                     color: Colors.green,
                     shape: BoxShape.circle,
                     boxShadow: [
                       BoxShadow(
                         color: Colors.green.withOpacity(_glowAnimation.value),
-                        blurRadius: 8 * _glowAnimation.value,
-                        spreadRadius: 2 * _glowAnimation.value,
+                        blurRadius: 8 * scale * _glowAnimation.value,
+                        spreadRadius: 2 * scale * _glowAnimation.value,
                       ),
                     ],
                   ),
                 );
               },
             ),
-            const SizedBox(width: 8),
+            SizedBox(width: 8 * scale),
             Text(
               'All Services Nominal',
               style: TextStyle(
                 color: textColor,
-                fontSize: 18,
-                letterSpacing: 1.6,
+                fontSize: 18 * scale,
+                letterSpacing: 1.6 * scale,
               ),
             ),
           ],
@@ -273,27 +279,27 @@ class _FooterState extends State<Footer> with SingleTickerProviderStateMixin {
         Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(Icons.access_time, size: 14, color: textColor),
-            const SizedBox(width: 6),
+            Icon(Icons.access_time, size: 14 * scale, color: textColor),
+            SizedBox(width: 6 * scale),
             Text(
               _formatSessionTime(),
               style: TextStyle(
                 color: textColor,
-                fontSize: 18,
-                letterSpacing: 1.6,
+                fontSize: 18 * scale,
+                letterSpacing: 1.6 * scale,
               ),
             ),
-            const SizedBox(width: 20),
+            SizedBox(width: 20 * scale),
             Text(
               '$_viewCount views',
               style: TextStyle(
                 color: textColor,
-                fontSize: 18,
-                letterSpacing: 1.6,
+                fontSize: 18 * scale,
+                letterSpacing: 1.6 * scale,
               ),
             ),
             if (_latestCommitHash != null) ...[
-              const SizedBox(width: 20),
+              SizedBox(width: 20 * scale),
               _HoverCommit(
                 commitHash: _latestCommitHash!,
                 commitUrl: _latestCommitUrl!,
@@ -302,7 +308,7 @@ class _FooterState extends State<Footer> with SingleTickerProviderStateMixin {
                 onTap: () => _launchUrl(_latestCommitUrl!),
               ),
             ],
-            const SizedBox(width: 20),
+            SizedBox(width: 20 * scale),
             _buildSocialLinks(textColor),
           ],
         ),
@@ -400,26 +406,26 @@ class _FooterState extends State<Footer> with SingleTickerProviderStateMixin {
       mainAxisSize: MainAxisSize.min,
       children: [
         if (_githubUrl != null)
-          _HoverIcon(
-            icon: Icons.code,
+          _HoverImageIcon(
+            imagePath: 'assets/github.png',
             color: textColor,
             hoverColor: themeProvider.accentColor,
             onTap: () => _launchUrl(_githubUrl!),
           ),
         const SizedBox(width: 8),
         if (_linkedinUrl != null)
-          _HoverIcon(
-            icon: Icons.business,
+          _HoverImageIcon(
+            imagePath: 'assets/linkedin.png',
             color: textColor,
             hoverColor: themeProvider.accentColor,
             onTap: () => _launchUrl(_linkedinUrl!),
           ),
         const SizedBox(width: 8),
-        _HoverIcon(
-          icon: Icons.camera_alt,
+        _HoverImageIcon(
+          imagePath: 'assets/instagram.png',
           color: textColor,
           hoverColor: themeProvider.accentColor,
-          onTap: () => _launchUrl('https://instagram.com/hassan_k_69'),
+          onTap: () => _launchUrl('https://instagram.com/hassan_k_6'),
         ),
       ],
     );
@@ -467,6 +473,49 @@ class _HoverIconState extends State<_HoverIcon> {
             widget.icon,
             color: _isHovering ? widget.hoverColor : widget.color,
             size: 18,
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _HoverImageIcon extends StatefulWidget {
+  final String imagePath;
+  final Color color;
+  final Color hoverColor;
+  final VoidCallback onTap;
+
+  const _HoverImageIcon({
+    required this.imagePath,
+    required this.color,
+    required this.hoverColor,
+    required this.onTap,
+  });
+
+  @override
+  State<_HoverImageIcon> createState() => _HoverImageIconState();
+}
+
+class _HoverImageIconState extends State<_HoverImageIcon> {
+  bool _isHovering = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return MouseRegion(
+      onEnter: (_) => setState(() => _isHovering = true),
+      onExit: (_) => setState(() => _isHovering = false),
+      cursor: SystemMouseCursors.click,
+      child: GestureDetector(
+        onTap: widget.onTap,
+        child: Padding(
+          padding: const EdgeInsets.all(6.0),
+          child: ColorFiltered(
+            colorFilter: ColorFilter.mode(
+              _isHovering ? widget.hoverColor : widget.color,
+              BlendMode.srcIn,
+            ),
+            child: Image.asset(widget.imagePath, width: 18, height: 18),
           ),
         ),
       ),

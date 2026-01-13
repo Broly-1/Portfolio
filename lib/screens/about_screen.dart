@@ -254,9 +254,19 @@ class _AboutContentState extends State<AboutContent> {
           runSpacing: 15,
           children: [
             if (github.isNotEmpty)
-              _buildSocialLink(context, Icons.code, 'GitHub', github),
+              _buildSocialImageLink(
+                context,
+                'assets/github.png',
+                'GitHub',
+                github,
+              ),
             if (linkedin.isNotEmpty)
-              _buildSocialLink(context, Icons.business, 'LinkedIn', linkedin),
+              _buildSocialImageLink(
+                context,
+                'assets/linkedin.png',
+                'LinkedIn',
+                linkedin,
+              ),
             if (email.isNotEmpty)
               _buildSocialLink(
                 context,
@@ -298,6 +308,55 @@ class _AboutContentState extends State<AboutContent> {
               fontSize: 18,
               letterSpacing: 0.2,
             ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSocialImageLink(
+    BuildContext context,
+    String imagePath,
+    String label,
+    String url,
+  ) {
+    return InkWell(
+      onTap: () async {
+        final uri = Uri.parse(url);
+        if (await canLaunchUrl(uri)) {
+          await launchUrl(uri);
+        }
+      },
+      child: Row(
+        children: [
+          Consumer<ThemeProvider>(
+            builder: (context, themeProvider, child) {
+              final isLightTheme = themeProvider.selectedTheme != 'Mocha';
+              final iconColor = isLightTheme
+                  ? Colors.grey[700]!
+                  : Colors.grey[400]!;
+              return ColorFiltered(
+                colorFilter: ColorFilter.mode(iconColor, BlendMode.srcIn),
+                child: Image.asset(imagePath, width: 20, height: 20),
+              );
+            },
+          ),
+          const SizedBox(width: 8),
+          Consumer<ThemeProvider>(
+            builder: (context, themeProvider, child) {
+              final isLightTheme = themeProvider.selectedTheme != 'Mocha';
+              final iconColor = isLightTheme
+                  ? Colors.grey[700]!
+                  : Colors.grey[400]!;
+              return Text(
+                label,
+                style: TextStyle(
+                  color: iconColor,
+                  fontSize: 18,
+                  letterSpacing: 0.2,
+                ),
+              );
+            },
           ),
         ],
       ),

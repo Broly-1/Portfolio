@@ -16,7 +16,6 @@ class ProjectDetailScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final themeProvider = Provider.of<ThemeProvider>(context);
-    final isLightTheme = themeProvider.selectedTheme != 'Mocha';
 
     return Scaffold(
       backgroundColor: themeProvider.themeBackgroundColor,
@@ -39,7 +38,7 @@ class ProjectDetailScreen extends StatelessWidget {
                   child: Padding(
                     padding: const EdgeInsets.symmetric(
                       horizontal: 16,
-                      vertical: 40,
+                      vertical: 16,
                     ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -47,7 +46,7 @@ class ProjectDetailScreen extends StatelessWidget {
                         // Browser card with project info
                         _buildBrowserCard(context),
 
-                        const SizedBox(height: 32),
+                        const SizedBox(height: 16),
 
                         // Date and links row
                         Row(
@@ -149,7 +148,7 @@ class ProjectDetailScreen extends StatelessWidget {
                               ),
                             ],
                           ),
-                          const SizedBox(height: 32),
+                          const SizedBox(height: 16),
                         ],
 
                         // Project title heading
@@ -194,140 +193,150 @@ class ProjectDetailScreen extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // Browser card
-          Container(
-            constraints: const BoxConstraints(minHeight: 500),
-            decoration: BoxDecoration(
-              color: isLightTheme ? Colors.grey[300] : const Color(0xFF313244),
-              borderRadius: BorderRadius.circular(16),
-            ),
-            padding: const EdgeInsets.all(40),
-            child: Center(
-              child: AspectRatio(
-                aspectRatio: 16 / 10,
-                child: Container(
-                  decoration: BoxDecoration(
-                    color: isLightTheme
-                        ? const Color(0xFF2D2D2D)
-                        : const Color(0xFF1E1E2E),
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Column(
+          Hero(
+            tag: 'project_browser_${project.id}',
+            child: Material(
+              color: Colors.transparent,
+              child: Container(
+                constraints: const BoxConstraints(minHeight: 500),
+                decoration: BoxDecoration(
+                  color: isLightTheme
+                      ? Colors.grey[300]
+                      : const Color(0xFF313244),
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                padding: const EdgeInsets.all(40),
+                child: Center(
+                  child: AspectRatio(
+                    aspectRatio: 16 / 10,
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: isLightTheme
+                            ? const Color(0xFF2D2D2D)
+                            : const Color(0xFF1E1E2E),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          // Browser header
-                          Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 16,
-                              vertical: 12,
-                            ),
-                            decoration: BoxDecoration(
-                              color: isLightTheme
-                                  ? const Color(0xFF3D3D3D)
-                                  : const Color(0xFF2D2D3D),
-                              borderRadius: const BorderRadius.vertical(
-                                top: Radius.circular(12),
-                              ),
-                            ),
-                            child: Row(
-                              children: [
-                                _buildDot(const Color(0xFFF38BA8)),
-                                const SizedBox(width: 8),
-                                _buildDot(const Color(0xFFF9E2AF)),
-                                const SizedBox(width: 8),
-                                _buildDot(const Color(0xFFA6E3A1)),
-                              ],
-                            ),
-                          ),
-                          // Browser content
-                          Padding(
-                            padding: const EdgeInsets.all(20),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                // Repo name
-                                RichText(
-                                  text: TextSpan(
-                                    children: [
-                                      TextSpan(
-                                        text: 'Broly-1',
-                                        style: const TextStyle(
-                                          fontSize: 16,
-                                          color: Color(0xFFF38BA8),
-                                          fontWeight: FontWeight.w500,
-                                        ),
-                                      ),
-                                      TextSpan(
-                                        text: ' / ',
-                                        style: TextStyle(
-                                          fontSize: 16,
-                                          color: Colors.white.withOpacity(0.5),
-                                        ),
-                                      ),
-                                      TextSpan(
-                                        text: project.name,
-                                        style: TextStyle(
-                                          fontSize: 16,
-                                          color: themeProvider.accentColor,
-                                          fontWeight: FontWeight.bold,
-                                        ),
-                                      ),
-                                    ],
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              // Browser header
+                              Container(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 16,
+                                  vertical: 12,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: isLightTheme
+                                      ? const Color(0xFF3D3D3D)
+                                      : const Color(0xFF2D2D3D),
+                                  borderRadius: const BorderRadius.vertical(
+                                    top: Radius.circular(12),
                                   ),
                                 ),
-                                const SizedBox(height: 12),
-                                // Description
+                                child: Row(
+                                  children: [
+                                    _buildDot(const Color(0xFFF38BA8)),
+                                    const SizedBox(width: 8),
+                                    _buildDot(const Color(0xFFF9E2AF)),
+                                    const SizedBox(width: 8),
+                                    _buildDot(const Color(0xFFA6E3A1)),
+                                  ],
+                                ),
+                              ),
+                              // Browser content
+                              Padding(
+                                padding: const EdgeInsets.all(20),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    // Repo name
+                                    RichText(
+                                      text: TextSpan(
+                                        children: [
+                                          TextSpan(
+                                            text: 'Broly-1',
+                                            style: const TextStyle(
+                                              fontSize: 16,
+                                              color: Color(0xFFF38BA8),
+                                              fontWeight: FontWeight.w500,
+                                            ),
+                                          ),
+                                          TextSpan(
+                                            text: ' / ',
+                                            style: TextStyle(
+                                              fontSize: 16,
+                                              color: Colors.white.withOpacity(
+                                                0.5,
+                                              ),
+                                            ),
+                                          ),
+                                          TextSpan(
+                                            text: project.name,
+                                            style: TextStyle(
+                                              fontSize: 16,
+                                              color: themeProvider.accentColor,
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                    const SizedBox(height: 12),
+                                    // Description
+                                    Text(
+                                      project.description,
+                                      style: TextStyle(
+                                        fontSize: 14,
+                                        color: Colors.white.withOpacity(0.8),
+                                      ),
+                                      maxLines: 3,
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                          // User info at bottom
+                          Padding(
+                            padding: const EdgeInsets.all(20),
+                            child: Row(
+                              children: [
+                                Container(
+                                  width: 40,
+                                  height: 40,
+                                  decoration: BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    border: Border.all(
+                                      color: Colors.white,
+                                      width: 2,
+                                    ),
+                                    image: const DecorationImage(
+                                      image: NetworkImage(
+                                        'https://avatars.githubusercontent.com/u/62743581?v=4',
+                                      ),
+                                      fit: BoxFit.cover,
+                                    ),
+                                  ),
+                                ),
+                                const SizedBox(width: 12),
                                 Text(
-                                  project.description,
+                                  'Broly-1',
                                   style: TextStyle(
                                     fontSize: 14,
-                                    color: Colors.white.withOpacity(0.8),
+                                    color: Colors.white.withOpacity(0.7),
                                   ),
-                                  maxLines: 3,
-                                  overflow: TextOverflow.ellipsis,
                                 ),
                               ],
                             ),
                           ),
                         ],
                       ),
-                      // User info at bottom
-                      Padding(
-                        padding: const EdgeInsets.all(20),
-                        child: Row(
-                          children: [
-                            Container(
-                              width: 40,
-                              height: 40,
-                              decoration: BoxDecoration(
-                                shape: BoxShape.circle,
-                                border: Border.all(
-                                  color: Colors.white,
-                                  width: 2,
-                                ),
-                                image: const DecorationImage(
-                                  image: NetworkImage(
-                                    'https://avatars.githubusercontent.com/u/62743581?v=4',
-                                  ),
-                                  fit: BoxFit.cover,
-                                ),
-                              ),
-                            ),
-                            const SizedBox(width: 12),
-                            Text(
-                              'Broly-1',
-                              style: TextStyle(
-                                fontSize: 14,
-                                color: Colors.white.withOpacity(0.7),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
+                    ),
                   ),
                 ),
               ),
@@ -338,7 +347,16 @@ class ProjectDetailScreen extends StatelessWidget {
 
           // Mobile screen preview
           Center(
-            child: SizedBox(width: 200, child: _buildMobileScreen(context)),
+            child: SizedBox(
+              width: 200,
+              child: Hero(
+                tag: 'project_phone_${project.id}',
+                child: Material(
+                  color: Colors.transparent,
+                  child: _buildMobileScreen(context),
+                ),
+              ),
+            ),
           ),
         ],
       );
@@ -351,140 +369,150 @@ class ProjectDetailScreen extends StatelessWidget {
         // Browser card (wider)
         Expanded(
           flex: 5,
-          child: Container(
-            constraints: const BoxConstraints(minHeight: 500),
-            decoration: BoxDecoration(
-              color: isLightTheme ? Colors.grey[300] : const Color(0xFF313244),
-              borderRadius: BorderRadius.circular(16),
-            ),
-            padding: const EdgeInsets.all(40),
-            child: Center(
-              child: AspectRatio(
-                aspectRatio: 16 / 10,
-                child: Container(
-                  decoration: BoxDecoration(
-                    color: isLightTheme
-                        ? const Color(0xFF2D2D2D)
-                        : const Color(0xFF1E1E2E),
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Column(
+          child: Hero(
+            tag: 'project_browser_${project.id}',
+            child: Material(
+              color: Colors.transparent,
+              child: Container(
+                constraints: const BoxConstraints(minHeight: 500),
+                decoration: BoxDecoration(
+                  color: isLightTheme
+                      ? Colors.grey[300]
+                      : const Color(0xFF313244),
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                padding: const EdgeInsets.all(40),
+                child: Center(
+                  child: AspectRatio(
+                    aspectRatio: 16 / 10,
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: isLightTheme
+                            ? const Color(0xFF2D2D2D)
+                            : const Color(0xFF1E1E2E),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          // Browser header
-                          Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 16,
-                              vertical: 12,
-                            ),
-                            decoration: BoxDecoration(
-                              color: isLightTheme
-                                  ? const Color(0xFF3D3D3D)
-                                  : const Color(0xFF2D2D3D),
-                              borderRadius: const BorderRadius.vertical(
-                                top: Radius.circular(12),
-                              ),
-                            ),
-                            child: Row(
-                              children: [
-                                _buildDot(const Color(0xFFF38BA8)),
-                                const SizedBox(width: 8),
-                                _buildDot(const Color(0xFFF9E2AF)),
-                                const SizedBox(width: 8),
-                                _buildDot(const Color(0xFFA6E3A1)),
-                              ],
-                            ),
-                          ),
-                          // Browser content
-                          Padding(
-                            padding: const EdgeInsets.all(20),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                // Repo name
-                                RichText(
-                                  text: TextSpan(
-                                    children: [
-                                      TextSpan(
-                                        text: 'Broly-1',
-                                        style: const TextStyle(
-                                          fontSize: 16,
-                                          color: Color(0xFFF38BA8),
-                                          fontWeight: FontWeight.w500,
-                                        ),
-                                      ),
-                                      TextSpan(
-                                        text: ' / ',
-                                        style: TextStyle(
-                                          fontSize: 16,
-                                          color: Colors.white.withOpacity(0.5),
-                                        ),
-                                      ),
-                                      TextSpan(
-                                        text: project.name,
-                                        style: TextStyle(
-                                          fontSize: 16,
-                                          color: themeProvider.accentColor,
-                                          fontWeight: FontWeight.bold,
-                                        ),
-                                      ),
-                                    ],
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              // Browser header
+                              Container(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 16,
+                                  vertical: 12,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: isLightTheme
+                                      ? const Color(0xFF3D3D3D)
+                                      : const Color(0xFF2D2D3D),
+                                  borderRadius: const BorderRadius.vertical(
+                                    top: Radius.circular(12),
                                   ),
                                 ),
-                                const SizedBox(height: 12),
-                                // Description
+                                child: Row(
+                                  children: [
+                                    _buildDot(const Color(0xFFF38BA8)),
+                                    const SizedBox(width: 8),
+                                    _buildDot(const Color(0xFFF9E2AF)),
+                                    const SizedBox(width: 8),
+                                    _buildDot(const Color(0xFFA6E3A1)),
+                                  ],
+                                ),
+                              ),
+                              // Browser content
+                              Padding(
+                                padding: const EdgeInsets.all(20),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    // Repo name
+                                    RichText(
+                                      text: TextSpan(
+                                        children: [
+                                          TextSpan(
+                                            text: 'Broly-1',
+                                            style: const TextStyle(
+                                              fontSize: 16,
+                                              color: Color(0xFFF38BA8),
+                                              fontWeight: FontWeight.w500,
+                                            ),
+                                          ),
+                                          TextSpan(
+                                            text: ' / ',
+                                            style: TextStyle(
+                                              fontSize: 16,
+                                              color: Colors.white.withOpacity(
+                                                0.5,
+                                              ),
+                                            ),
+                                          ),
+                                          TextSpan(
+                                            text: project.name,
+                                            style: TextStyle(
+                                              fontSize: 16,
+                                              color: themeProvider.accentColor,
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                    const SizedBox(height: 12),
+                                    // Description
+                                    Text(
+                                      project.description,
+                                      style: TextStyle(
+                                        fontSize: 14,
+                                        color: Colors.white.withOpacity(0.8),
+                                      ),
+                                      maxLines: 3,
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                          // User info at bottom
+                          Padding(
+                            padding: const EdgeInsets.all(20),
+                            child: Row(
+                              children: [
+                                Container(
+                                  width: 40,
+                                  height: 40,
+                                  decoration: BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    border: Border.all(
+                                      color: Colors.white,
+                                      width: 2,
+                                    ),
+                                    image: const DecorationImage(
+                                      image: NetworkImage(
+                                        'https://avatars.githubusercontent.com/u/62743581?v=4',
+                                      ),
+                                      fit: BoxFit.cover,
+                                    ),
+                                  ),
+                                ),
+                                const SizedBox(width: 12),
                                 Text(
-                                  project.description,
+                                  'Broly-1',
                                   style: TextStyle(
                                     fontSize: 14,
-                                    color: Colors.white.withOpacity(0.8),
+                                    color: Colors.white.withOpacity(0.7),
                                   ),
-                                  maxLines: 3,
-                                  overflow: TextOverflow.ellipsis,
                                 ),
                               ],
                             ),
                           ),
                         ],
                       ),
-                      // User info at bottom
-                      Padding(
-                        padding: const EdgeInsets.all(20),
-                        child: Row(
-                          children: [
-                            Container(
-                              width: 40,
-                              height: 40,
-                              decoration: BoxDecoration(
-                                shape: BoxShape.circle,
-                                border: Border.all(
-                                  color: Colors.white,
-                                  width: 2,
-                                ),
-                                image: const DecorationImage(
-                                  image: NetworkImage(
-                                    'https://avatars.githubusercontent.com/u/62743581?v=4',
-                                  ),
-                                  fit: BoxFit.cover,
-                                ),
-                              ),
-                            ),
-                            const SizedBox(width: 12),
-                            Text(
-                              'Broly-1',
-                              style: TextStyle(
-                                fontSize: 14,
-                                color: Colors.white.withOpacity(0.7),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
+                    ),
                   ),
                 ),
               ),
@@ -495,7 +523,16 @@ class ProjectDetailScreen extends StatelessWidget {
         const SizedBox(width: 24),
 
         // Mobile screen preview
-        Expanded(flex: 2, child: _MobileScreenPreview(project: project)),
+        Expanded(
+          flex: 2,
+          child: Hero(
+            tag: 'project_phone_${project.id}',
+            child: Material(
+              color: Colors.transparent,
+              child: _MobileScreenPreview(project: project),
+            ),
+          ),
+        ),
       ],
     );
   }

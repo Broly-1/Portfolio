@@ -3,6 +3,7 @@ import 'package:hassankamran/models/project.dart';
 import 'package:hassankamran/services/firebase_service.dart';
 import 'package:hassankamran/widgets/project_card.dart';
 import 'package:hassankamran/widgets/project_detail_content.dart';
+import 'project_detail_screen.dart';
 
 class ProjectsScreen extends StatefulWidget {
   final String? initialExpandedProjectId;
@@ -90,7 +91,7 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
         return SingleChildScrollView(
           padding: EdgeInsets.symmetric(
             horizontal: _getHorizontalPadding(context),
-            vertical: 40,
+            vertical: 20,
           ),
           child: Center(
             child: ConstrainedBox(
@@ -118,7 +119,7 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
                     ],
                   ),
 
-                  const SizedBox(height: 40),
+                  const SizedBox(height: 24),
 
                   // Projects Grid or Expanded Detail
                   if (_expandedProjectId != null)
@@ -174,10 +175,39 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
                                             ),
                                             child: ProjectCard(
                                               project: projects[i + j],
-                                              onTap: () =>
-                                                  _toggleProjectExpansion(
-                                                    projects[i + j].id,
+                                              onTap: () {
+                                                Navigator.of(context).push(
+                                                  PageRouteBuilder(
+                                                    pageBuilder:
+                                                        (
+                                                          context,
+                                                          animation,
+                                                          secondaryAnimation,
+                                                        ) =>
+                                                            ProjectDetailScreen(
+                                                              project:
+                                                                  projects[i +
+                                                                      j],
+                                                            ),
+                                                    transitionsBuilder:
+                                                        (
+                                                          context,
+                                                          animation,
+                                                          secondaryAnimation,
+                                                          child,
+                                                        ) {
+                                                          return FadeTransition(
+                                                            opacity: animation,
+                                                            child: child,
+                                                          );
+                                                        },
+                                                    transitionDuration:
+                                                        const Duration(
+                                                          milliseconds: 400,
+                                                        ),
                                                   ),
+                                                );
+                                              },
                                             ),
                                           ),
                                         ),

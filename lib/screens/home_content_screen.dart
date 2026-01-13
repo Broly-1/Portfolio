@@ -3,9 +3,12 @@ import 'package:hassankamran/models/home_content.dart';
 import 'package:hassankamran/models/project.dart';
 import 'package:hassankamran/services/firebase_service.dart';
 import 'package:hassankamran/widgets/project_card.dart';
+import 'package:hassankamran/Extensions/extensions.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../styles/theme_provider.dart';
+import '../widgets/bottom_widgets.dart';
+import 'project_detail_screen.dart';
 
 class HomeContentScreen extends StatelessWidget {
   final Function(String, {String? projectId}) onNavigate;
@@ -14,11 +17,11 @@ class HomeContentScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final themeProvider = Provider.of<ThemeProvider>(context);
     final firebaseService = FirebaseService();
     final screenWidth = MediaQuery.of(context).size.width;
     final isMobile = screenWidth < 600;
     final isTablet = screenWidth >= 600 && screenWidth < 1200;
+    final scale = context.responsiveScale;
 
     return StreamBuilder<HomeContent?>(
       stream: firebaseService.streamHomeContent(),
@@ -38,60 +41,71 @@ class HomeContentScreen extends StatelessWidget {
 
         return SingleChildScrollView(
           padding: EdgeInsets.symmetric(
-            horizontal: isMobile ? 20 : (isTablet ? 60 : 120),
-            vertical: isMobile ? 24 : 60,
+            horizontal: isMobile ? 20 : (isTablet ? 48 : 120 * scale),
+            vertical: isMobile ? 24 : 60 * scale,
           ),
           child: Center(
             child: ConstrainedBox(
-              constraints: BoxConstraints(maxWidth: screenWidth * 0.7),
+              constraints: BoxConstraints(
+                maxWidth: isMobile ? double.infinity : screenWidth * 0.7,
+              ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   // Hero section with accent color support
-                  _buildHeadingWithAccent(
-                    context,
-                    homeContent.heading,
-                    themeProvider.accentColor,
+                  Consumer<ThemeProvider>(
+                    builder: (context, themeProvider, child) {
+                      return _buildHeadingWithAccent(
+                        context,
+                        homeContent.heading,
+                        themeProvider.accentColor,
+                        scale,
+                      );
+                    },
                   ),
-                  const SizedBox(height: 20),
+                  SizedBox(height: 20 * scale),
                   ConstrainedBox(
-                    constraints: const BoxConstraints(maxWidth: 700),
+                    constraints: BoxConstraints(maxWidth: 700 * scale),
                     child: _buildParagraphWithLinks(
                       context,
                       homeContent.paragraph,
+                      scale,
                     ),
                   ),
-                  const SizedBox(height: 32),
+                  SizedBox(height: 32 * scale),
 
                   // Action buttons - minimalist icon-only style
                   Wrap(
-                    spacing: 20,
-                    runSpacing: 12,
+                    spacing: 20 * scale,
+                    runSpacing: 12 * scale,
                     children: [
                       if (homeContent.githubUrl != null)
-                        _buildMinimalistIconButton(
+                        _buildMinimalistImageButton(
                           context,
-                          Icons.code,
+                          'assets/github.png',
                           'GitHub',
                           () => _launchUrl(homeContent.githubUrl!),
+                          scale,
                         ),
                       if (homeContent.linkedinUrl != null)
-                        _buildMinimalistIconButton(
+                        _buildMinimalistImageButton(
                           context,
-                          Icons.work_outline,
+                          'assets/linkedin.png',
                           'LinkedIn',
                           () => _launchUrl(homeContent.linkedinUrl!),
+                          scale,
                         ),
                       _buildMinimalistIconButton(
                         context,
                         Icons.arrow_forward,
                         'More about me',
                         () => onNavigate('about'),
+                        scale,
                       ),
                     ],
                   ),
 
-                  const SizedBox(height: 80),
+                  SizedBox(height: 80 * scale),
 
                   // Featured projects grid
                   StreamBuilder<List<Project>>(
@@ -122,81 +136,127 @@ class HomeContentScreen extends StatelessWidget {
 
                       return LayoutBuilder(
                         builder: (context, constraints) {
-                          final spacing = 20.0;
-                          final cardWidth = constraints.maxWidth.clamp(
-                            300.0,
-                            600.0,
-                          );
+                          final spacing = 20.0 * scale;
+                          final isMobile = constraints.maxWidth < 900;
+                          // On mobile, use full available width; on desktop, clamp it
+                          final cardWidth = isMobile
+                              ? double.infinity
+                              : constraints.maxWidth.clamp(
+                                  300.0 * scale,
+                                  600.0 * scale,
+                                );
                           final canFitTwo =
-                              constraints.maxWidth >= (cardWidth * 2 + spacing);
+                              !isMobile &&
+                              constraints.maxWidth >=
+                                  (600.0 * scale * 2 + spacing);
 
                           return Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               // Featured Projects header with View all button
-                              Row(
-                                children: [
-                                  Icon(
-                                    Icons.star_border,
-                                    size: 24,
-                                    color: themeProvider.accentColor,
-                                  ),
-                                  const SizedBox(width: 10),
-                                  Text(
-                                    'Featured Projects',
-                                    style: TextStyle(
-                                      fontWeight: FontWeight.w600,
-                                      fontSize: 22,
-                                      letterSpacing: 1.6,
-                                    ),
-                                  ),
-                                  const Spacer(),
-                                  if (canFitTwo)
-                                    Padding(
-                                      padding: EdgeInsets.only(
-                                        right:
-                                            constraints.maxWidth -
-                                            (cardWidth * 2 + spacing),
+                              Consumer<ThemeProvider>(
+                                builder: (context, themeProvider, child) {
+                                  return Row(
+                                    children: [
+                                      Icon(
+                                        Icons.star_border,
+                                        size: 24 * scale,
+                                        color: themeProvider.accentColor,
                                       ),
-                                      child: InkWell(
-                                        onTap: () => onNavigate('projects'),
-                                        child: Row(
-                                          mainAxisSize: MainAxisSize.min,
-                                          children: [
-                                            Text(
-                                              'View all',
-                                              style: TextStyle(
-                                                color:
-                                                    themeProvider.accentColor,
-                                                fontSize: 18,
-                                                letterSpacing: 1.6,
-                                              ),
-                                            ),
-                                            const SizedBox(width: 6),
-                                            Icon(
-                                              Icons.arrow_forward,
-                                              color: themeProvider.accentColor,
-                                              size: 18,
-                                            ),
-                                          ],
+                                      SizedBox(width: 10 * scale),
+                                      Text(
+                                        'Featured Projects',
+                                        style: TextStyle(
+                                          fontWeight: FontWeight.w600,
+                                          fontSize: 22 * scale,
+                                          letterSpacing: 1.6 * scale,
                                         ),
                                       ),
-                                    ),
-                                ],
+                                      const Spacer(),
+                                      if (canFitTwo)
+                                        Padding(
+                                          padding: EdgeInsets.only(
+                                            right:
+                                                constraints.maxWidth -
+                                                (cardWidth * 2 + spacing),
+                                          ),
+                                          child: InkWell(
+                                            onTap: () => onNavigate('projects'),
+                                            child: Row(
+                                              mainAxisSize: MainAxisSize.min,
+                                              children: [
+                                                Text(
+                                                  'View all',
+                                                  style: TextStyle(
+                                                    color: themeProvider
+                                                        .accentColor,
+                                                    fontSize: 18 * scale,
+                                                    letterSpacing: 1.6 * scale,
+                                                  ),
+                                                ),
+                                                SizedBox(width: 6 * scale),
+                                                Icon(
+                                                  Icons.arrow_forward,
+                                                  color:
+                                                      themeProvider.accentColor,
+                                                  size: 18 * scale,
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                        ),
+                                    ],
+                                  );
+                                },
                               ),
-                              const SizedBox(height: 32),
+                              SizedBox(height: 32 * scale),
                               // Project cards
                               Wrap(
                                 spacing: spacing,
                                 runSpacing: spacing,
                                 children: featuredProjects.map((project) {
-                                  return SizedBox(
-                                    width: cardWidth,
-                                    child: ProjectCard(
-                                      project: project,
-                                      onTap: () => onNavigate(
-                                        'projects',
-                                        projectId: project.id,
+                                  return ConstrainedBox(
+                                    constraints: BoxConstraints(
+                                      maxWidth: isMobile
+                                          ? double.infinity
+                                          : cardWidth,
+                                    ),
+                                    child: SizedBox(
+                                      width: isMobile
+                                          ? double.infinity
+                                          : cardWidth,
+                                      child: ProjectCard(
+                                        project: project,
+                                        onTap: () {
+                                          Navigator.of(context).push(
+                                            PageRouteBuilder(
+                                              pageBuilder:
+                                                  (
+                                                    context,
+                                                    animation,
+                                                    secondaryAnimation,
+                                                  ) => ProjectDetailScreen(
+                                                    project: project,
+                                                  ),
+                                              transitionsBuilder:
+                                                  (
+                                                    context,
+                                                    animation,
+                                                    secondaryAnimation,
+                                                    child,
+                                                  ) {
+                                                    return FadeTransition(
+                                                      opacity: animation,
+                                                      child: child,
+                                                    );
+                                                  },
+                                              transitionDuration:
+                                                  const Duration(
+                                                    milliseconds: 400,
+                                                  ),
+                                            ),
+                                          );
+                                        },
                                       ),
                                     ),
                                   );
@@ -205,6 +265,18 @@ class HomeContentScreen extends StatelessWidget {
                             ],
                           );
                         },
+                      );
+                    },
+                  ),
+
+                  SizedBox(height: 80 * scale),
+
+                  // Bottom Widgets (Accent Selector, Cal.com, Recent Commits)
+                  LayoutBuilder(
+                    builder: (context, constraints) {
+                      return BottomWidgets(
+                        scale: scale,
+                        maxWidth: constraints.maxWidth,
                       );
                     },
                   ),
@@ -222,20 +294,21 @@ class HomeContentScreen extends StatelessWidget {
     IconData icon,
     String tooltip,
     VoidCallback onPressed,
+    double scale,
   ) {
     return Padding(
-      padding: const EdgeInsets.only(right: 12),
+      padding: EdgeInsets.only(right: 12 * scale),
       child: InkWell(
         onTap: onPressed,
-        borderRadius: BorderRadius.circular(4),
+        borderRadius: BorderRadius.circular(4 * scale),
         child: Padding(
-          padding: const EdgeInsets.all(8),
+          padding: EdgeInsets.all(8 * scale),
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Icon(icon, size: 18),
-              const SizedBox(width: 6),
-              Text(tooltip, style: const TextStyle(fontSize: 14)),
+              Icon(icon, size: 18 * scale),
+              SizedBox(width: 6 * scale),
+              Text(tooltip, style: TextStyle(fontSize: 14 * scale)),
             ],
           ),
         ),
@@ -243,25 +316,44 @@ class HomeContentScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildActionButton(
+  Widget _buildMinimalistImageButton(
     BuildContext context,
-    String label,
-    IconData icon,
+    String imagePath,
+    String tooltip,
     VoidCallback onPressed,
-    Color color,
+    double scale,
   ) {
-    return ElevatedButton.icon(
-      onPressed: onPressed,
-      icon: Icon(icon, size: 20),
-      label: Text(
-        label,
-        style: const TextStyle(fontSize: 16, letterSpacing: 1.2),
-      ),
-      style: ElevatedButton.styleFrom(
-        backgroundColor: color,
-        foregroundColor: Colors.white,
-        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+    return Padding(
+      padding: EdgeInsets.only(right: 12 * scale),
+      child: InkWell(
+        onTap: onPressed,
+        borderRadius: BorderRadius.circular(4 * scale),
+        child: Padding(
+          padding: EdgeInsets.all(8 * scale),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Consumer<ThemeProvider>(
+                builder: (context, themeProvider, child) {
+                  final isLightTheme = themeProvider.selectedTheme != 'Mocha';
+                  final iconColor = isLightTheme
+                      ? Colors.black87
+                      : Colors.white;
+                  return ColorFiltered(
+                    colorFilter: ColorFilter.mode(iconColor, BlendMode.srcIn),
+                    child: Image.asset(
+                      imagePath,
+                      width: 18 * scale,
+                      height: 18 * scale,
+                    ),
+                  );
+                },
+              ),
+              SizedBox(width: 6 * scale),
+              Text(tooltip, style: TextStyle(fontSize: 14 * scale)),
+            ],
+          ),
+        ),
       ),
     );
   }
@@ -278,6 +370,7 @@ class HomeContentScreen extends StatelessWidget {
     BuildContext context,
     String heading,
     Color accentColor,
+    double scale,
   ) {
     final regex = RegExp(r'\{\{(.+?)\}\}');
     final matches = regex.allMatches(heading);
@@ -286,11 +379,11 @@ class HomeContentScreen extends StatelessWidget {
       // No accent markers, return plain text
       return Text(
         heading,
-        style: const TextStyle(
-          fontSize: 36,
+        style: TextStyle(
+          fontSize: 36 * scale,
           fontWeight: FontWeight.w600,
           height: 1.2,
-          letterSpacing: 1.6,
+          letterSpacing: 1.6 * scale,
           color: Colors.white,
         ),
       );
@@ -305,11 +398,11 @@ class HomeContentScreen extends StatelessWidget {
         spans.add(
           TextSpan(
             text: heading.substring(lastIndex, match.start),
-            style: const TextStyle(
-              fontSize: 36,
+            style: TextStyle(
+              fontSize: 36 * scale,
               fontWeight: FontWeight.w600,
               height: 1.2,
-              letterSpacing: 1.6,
+              letterSpacing: 1.6 * scale,
               color: Colors.white,
             ),
           ),
@@ -321,10 +414,10 @@ class HomeContentScreen extends StatelessWidget {
         TextSpan(
           text: match.group(1),
           style: TextStyle(
-            fontSize: 36,
+            fontSize: 36 * scale,
             fontWeight: FontWeight.w600,
             height: 1.2,
-            letterSpacing: 1.6,
+            letterSpacing: 1.6 * scale,
             color: accentColor,
           ),
         ),
@@ -338,11 +431,11 @@ class HomeContentScreen extends StatelessWidget {
       spans.add(
         TextSpan(
           text: heading.substring(lastIndex),
-          style: const TextStyle(
-            fontSize: 36,
+          style: TextStyle(
+            fontSize: 36 * scale,
             fontWeight: FontWeight.w600,
             height: 1.2,
-            letterSpacing: 1.6,
+            letterSpacing: 1.6 * scale,
             color: Colors.white,
           ),
         ),
@@ -356,7 +449,11 @@ class HomeContentScreen extends StatelessWidget {
   }
 
   // Parse paragraph and make [text](url) clickable
-  Widget _buildParagraphWithLinks(BuildContext context, String paragraph) {
+  Widget _buildParagraphWithLinks(
+    BuildContext context,
+    String paragraph,
+    double scale,
+  ) {
     final regex = RegExp(r'\[(.+?)\]\((.+?)\)');
     final matches = regex.allMatches(paragraph);
 
@@ -365,10 +462,10 @@ class HomeContentScreen extends StatelessWidget {
       return Text(
         paragraph,
         textAlign: TextAlign.justify,
-        style: const TextStyle(
-          fontSize: 18,
+        style: TextStyle(
+          fontSize: 18 * scale,
           height: 1.6,
-          letterSpacing: 1.3,
+          letterSpacing: 1.3 * scale,
           color: Color(0xFFB4B8C5),
         ),
       );
@@ -383,10 +480,10 @@ class HomeContentScreen extends StatelessWidget {
         spans.add(
           TextSpan(
             text: paragraph.substring(lastIndex, match.start),
-            style: const TextStyle(
-              fontSize: 18,
+            style: TextStyle(
+              fontSize: 18 * scale,
               height: 1.6,
-              letterSpacing: 1.3,
+              letterSpacing: 1.3 * scale,
               color: Color(0xFFB4B8C5),
             ),
           ),
@@ -406,9 +503,9 @@ class HomeContentScreen extends StatelessWidget {
               child: Text(
                 linkText,
                 style: TextStyle(
-                  fontSize: 18,
+                  fontSize: 18 * scale,
                   height: 1.6,
-                  letterSpacing: 1.3,
+                  letterSpacing: 1.3 * scale,
                   color: Provider.of<ThemeProvider>(
                     context,
                     listen: false,
@@ -429,10 +526,10 @@ class HomeContentScreen extends StatelessWidget {
       spans.add(
         TextSpan(
           text: paragraph.substring(lastIndex),
-          style: const TextStyle(
-            fontSize: 18,
+          style: TextStyle(
+            fontSize: 18 * scale,
             height: 1.6,
-            letterSpacing: 1.3,
+            letterSpacing: 1.3 * scale,
             color: Color(0xFFB4B8C5),
           ),
         ),
