@@ -3,10 +3,12 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'dart:io';
 import 'package:hassankamran/models/project.dart';
 import 'package:hassankamran/models/home_content.dart';
+import 'cache_service.dart';
 
 class FirebaseService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final FirebaseStorage _storage = FirebaseStorage.instance;
+  final CacheService _cache = CacheService();
 
   // Collection references
   static const String _aboutCollection = 'about';
@@ -16,22 +18,17 @@ class FirebaseService {
   // Get About data
   Future<Map<String, dynamic>?> getAboutData() async {
     try {
-      print('🔍 Fetching about data from Firestore...');
       final doc = await _firestore
           .collection(_aboutCollection)
           .doc('main')
           .get();
 
-      print('📄 Document exists: ${doc.exists}');
       if (doc.exists) {
         final data = doc.data();
-        print('✅ Data retrieved: $data');
         return data;
       }
-      print('⚠️ No document found');
       return null;
     } catch (e) {
-      print('❌ Error getting about data: $e');
       return null;
     }
   }
@@ -54,7 +51,6 @@ class FirebaseService {
       }
       return null;
     } catch (e) {
-      print('❌ Error getting resume URL: $e');
       return null;
     }
   }
@@ -73,7 +69,7 @@ class FirebaseService {
         }
       });
     } catch (e) {
-      print('❌ Error incrementing view count: $e');
+      // Error incrementing view count
     }
   }
 
@@ -85,7 +81,6 @@ class FirebaseService {
       }
       return 0;
     } catch (e) {
-      print('❌ Error getting view count: $e');
       return 0;
     }
   }
@@ -94,17 +89,27 @@ class FirebaseService {
 
   // Get all projects
   Future<List<Project>> getProjects() async {
+    // Check cache first
+    final cached = _cache.get<List<Project>>('projects');
+    if (cached != null) {
+      return cached;
+    }
+
     try {
-      print('🔍 Fetching projects from Firestore...');
       final snapshot = await _firestore
           .collection(_projectsCollection)
           .orderBy('order')
-          .get();
+          .get(const GetOptions(source: Source.serverAndCache));
 
-      print('📄 Found ${snapshot.docs.length} projects');
-      return snapshot.docs.map((doc) => Project.fromFirestore(doc)).toList();
+      final projects = snapshot.docs
+          .map((doc) => Project.fromFirestore(doc))
+          .toList();
+
+      // Cache the results
+      _cache.set('projects', projects, duration: const Duration(minutes: 15));
+
+      return projects;
     } catch (e) {
-      print('❌ Error getting projects: $e');
       return [];
     }
   }
@@ -123,19 +128,26 @@ class FirebaseService {
 
   // Get single project by ID
   Future<Project?> getProject(String projectId) async {
+    // Check cache first
+    final cacheKey = 'project_$projectId';
+    final cached = _cache.get<Project>(cacheKey);
+    if (cached != null) {
+      return cached;
+    }
+
     try {
-      print('🔍 Fetching project $projectId...');
       final doc = await _firestore
           .collection(_projectsCollection)
           .doc(projectId)
-          .get();
+          .get(const GetOptions(source: Source.serverAndCache));
 
       if (doc.exists) {
-        return Project.fromFirestore(doc);
+        final project = Project.fromFirestore(doc);
+        _cache.set(cacheKey, project, duration: const Duration(minutes: 15));
+        return project;
       }
       return null;
     } catch (e) {
-      print('❌ Error getting project: $e');
       return null;
     }
   }
@@ -143,15 +155,12 @@ class FirebaseService {
   // Create new project
   Future<String?> createProject(Project project) async {
     try {
-      print('➕ Creating new project...');
       final docRef = await _firestore
           .collection(_projectsCollection)
           .add(project.toMap());
 
-      print('✅ Project created with ID: ${docRef.id}');
       return docRef.id;
     } catch (e) {
-      print('❌ Error creating project: $e');
       return null;
     }
   }
@@ -159,16 +168,13 @@ class FirebaseService {
   // Update existing project
   Future<bool> updateProject(String projectId, Project project) async {
     try {
-      print('📝 Updating project $projectId...');
       await _firestore
           .collection(_projectsCollection)
           .doc(projectId)
           .update(project.toMap());
 
-      print('✅ Project updated successfully');
       return true;
     } catch (e) {
-      print('❌ Error updating project: $e');
       return false;
     }
   }
@@ -176,8 +182,6 @@ class FirebaseService {
   // Delete project
   Future<bool> deleteProject(String projectId) async {
     try {
-      print('🗑️ Deleting project $projectId...');
-
       // First get the project to delete its thumbnail if exists
       final project = await getProject(projectId);
       if (project?.thumbnailUrl != null) {
@@ -187,10 +191,8 @@ class FirebaseService {
       // Then delete the document
       await _firestore.collection(_projectsCollection).doc(projectId).delete();
 
-      print('✅ Project deleted successfully');
       return true;
     } catch (e) {
-      print('❌ Error deleting project: $e');
       return false;
     }
   }
@@ -198,16 +200,12 @@ class FirebaseService {
   // Upload project thumbnail
   Future<String?> uploadThumbnail(File file, String projectId) async {
     try {
-      print('📤 Uploading thumbnail for project $projectId...');
-
       final ref = _storage.ref().child('projects/$projectId/thumbnail.png');
       final uploadTask = await ref.putFile(file);
       final downloadUrl = await uploadTask.ref.getDownloadURL();
 
-      print('✅ Thumbnail uploaded: $downloadUrl');
       return downloadUrl;
     } catch (e) {
-      print('❌ Error uploading thumbnail: $e');
       return null;
     }
   }
@@ -215,13 +213,10 @@ class FirebaseService {
   // Delete thumbnail from storage
   Future<bool> deleteThumbnail(String imageUrl) async {
     try {
-      print('🗑️ Deleting thumbnail...');
       final ref = _storage.refFromURL(imageUrl);
       await ref.delete();
-      print('✅ Thumbnail deleted');
       return true;
     } catch (e) {
-      print('❌ Error deleting thumbnail: $e');
       return false;
     }
   }
@@ -245,7 +240,6 @@ class FirebaseService {
   // Get home content
   Future<HomeContent?> getHomeContent() async {
     try {
-      print('🔍 Fetching home content...');
       final doc = await _firestore
           .collection(_homeContentCollection)
           .doc('main')
@@ -256,7 +250,6 @@ class FirebaseService {
       }
       return null;
     } catch (e) {
-      print('❌ Error getting home content: $e');
       return null;
     }
   }
@@ -264,16 +257,13 @@ class FirebaseService {
   // Update home content
   Future<bool> updateHomeContent(HomeContent content) async {
     try {
-      print('📝 Updating home content...');
       await _firestore
           .collection(_homeContentCollection)
           .doc('main')
           .set(content.toFirestore());
 
-      print('✅ Home content updated successfully');
       return true;
     } catch (e) {
-      print('❌ Error updating home content: $e');
       return false;
     }
   }

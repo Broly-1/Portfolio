@@ -27,8 +27,6 @@ class _AboutContentState extends State<AboutContent> {
 
   Future<void> _loadAboutData() async {
     final data = await _firebaseService.getAboutData();
-    print('📊 About data loaded: $data');
-    print('🖼️ Image URL: ${data?['imageUrl']}');
     if (mounted) {
       setState(() {
         _aboutData = data;

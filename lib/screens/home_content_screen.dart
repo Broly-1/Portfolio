@@ -10,13 +10,23 @@ import '../styles/theme_provider.dart';
 import '../widgets/bottom_widgets.dart';
 import 'project_detail_screen.dart';
 
-class HomeContentScreen extends StatelessWidget {
+class HomeContentScreen extends StatefulWidget {
   final Function(String, {String? projectId}) onNavigate;
 
   const HomeContentScreen({super.key, required this.onNavigate});
 
   @override
+  State<HomeContentScreen> createState() => _HomeContentScreenState();
+}
+
+class _HomeContentScreenState extends State<HomeContentScreen>
+    with AutomaticKeepAliveClientMixin {
+  @override
+  bool get wantKeepAlive => true;
+
+  @override
   Widget build(BuildContext context) {
+    super.build(context);
     final firebaseService = FirebaseService();
     final screenWidth = MediaQuery.of(context).size.width;
     final isMobile = screenWidth < 600;
@@ -99,7 +109,7 @@ class HomeContentScreen extends StatelessWidget {
                         context,
                         Icons.arrow_forward,
                         'More about me',
-                        () => onNavigate('about'),
+                        () => widget.onNavigate('about'),
                         scale,
                       ),
                     ],
@@ -181,7 +191,8 @@ class HomeContentScreen extends StatelessWidget {
                                                 (cardWidth * 2 + spacing),
                                           ),
                                           child: InkWell(
-                                            onTap: () => onNavigate('projects'),
+                                            onTap: () =>
+                                                widget.onNavigate('projects'),
                                             child: Row(
                                               mainAxisSize: MainAxisSize.min,
                                               children: [

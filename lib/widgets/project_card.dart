@@ -3,6 +3,7 @@ import 'package:hassankamran/models/project.dart';
 import 'package:hassankamran/Extensions/extensions.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import '../styles/theme_provider.dart';
 
 class ProjectCard extends StatefulWidget {
@@ -441,10 +442,18 @@ class _ProjectCardState extends State<ProjectCard> {
                       child: ClipRRect(
                         borderRadius: BorderRadius.circular(20 * scale),
                         child: widget.project.thumbnailUrl != null
-                            ? Image.network(
-                                widget.project.thumbnailUrl!,
+                            ? CachedNetworkImage(
+                                imageUrl: widget.project.thumbnailUrl!,
                                 fit: BoxFit.cover,
-                                errorBuilder: (context, error, stackTrace) =>
+                                placeholder: (context, url) => Container(
+                                  color: Colors.grey[900],
+                                  child: const Center(
+                                    child: CircularProgressIndicator(
+                                      strokeWidth: 2,
+                                    ),
+                                  ),
+                                ),
+                                errorWidget: (context, url, error) =>
                                     _buildPlaceholder(context, scale),
                               )
                             : _buildPlaceholder(context, scale),

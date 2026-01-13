@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'cache_service.dart';
 
 class GitHubCommit {
   final String message;
@@ -31,29 +32,62 @@ class GitHubCommit {
       repoName: json['repoName'] ?? '',
     );
   }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'message': message,
+      'authorName': authorName,
+      'date': date.toIso8601String(),
+      'sha': sha,
+      'additions': additions,
+      'deletions': deletions,
+      'repoName': repoName,
+    };
+  }
 }
 
 class GitHubService {
   static const String _username = 'Broly-1';
+  final CacheService _cache = CacheService();
+  static const _cacheDuration = Duration(
+    hours: 1,
+  ); // Cache for 1 hour to reduce API calls
 
   Future<List<GitHubCommit>> getRecentCommits({int count = 3}) async {
+    // Check cache first
+    final cacheKey = 'github_commits_$count';
+    final cached = _cache.get<List<GitHubCommit>>(cacheKey);
+    if (cached != null) {
+      return cached;
+    }
+
     try {
-      print('🔍 BottomWidgets: Starting to fetch activity from GitHub...');
       final apiUrl = 'https://api.github.com/users/$_username/events/public';
-      print('📡 BottomWidgets: Fetching from $apiUrl');
 
-      final response = await http.get(
-        Uri.parse(apiUrl),
-        headers: {'Accept': 'application/vnd.github.v3+json'},
-      );
+      final response = await http
+          .get(
+            Uri.parse(apiUrl),
+            headers: {'Accept': 'application/vnd.github.v3+json'},
+          )
+          .timeout(
+            const Duration(seconds: 10),
+            onTimeout: () {
+              throw Exception('GitHub API request timed out');
+            },
+          );
 
-      print(
-        '📊 BottomWidgets: GitHub API response status: ${response.statusCode}',
-      );
+      // Check for rate limit
+      if (response.statusCode == 403) {
+        final rateLimitRemaining = response.headers['x-ratelimit-remaining'];
+        if (rateLimitRemaining == '0') {
+          // Return cached data even if expired, or empty list
+          final expiredCache = _cache.get<List<GitHubCommit>>(cacheKey);
+          return expiredCache ?? [];
+        }
+      }
 
       if (response.statusCode == 200) {
         final List<dynamic> events = json.decode(response.body);
-        print('📦 BottomWidgets: Received ${events.length} events');
 
         List<GitHubCommit> commits = [];
 
@@ -67,7 +101,6 @@ class GitHubService {
             if (payload != null && payload['head'] != null) {
               final sha = payload['head'];
               final shortSha = sha.substring(0, 7);
-              print('  📍 BottomWidgets: Found push event $shortSha in $repo');
 
               // Fetch the actual commit details from the commits API
               try {
@@ -91,33 +124,25 @@ class GitHubService {
                     repoName: repo.split('/').last,
                   );
                   commits.add(commit);
-                  print(
-                    '  ✅ BottomWidgets: Added commit: ${commit.message.split('\n').first}',
-                  );
-                } else {
-                  print(
-                    '  ⚠️ BottomWidgets: Failed to fetch commit details: ${commitResponse.statusCode}',
-                  );
                 }
-              } catch (e) {
-                print('  ❌ BottomWidgets: Error fetching commit $sha: $e');
-              }
+              } catch (e) {}
             }
           }
         }
 
-        print(
-          '✨ BottomWidgets: Successfully fetched ${commits.length} commits with details',
-        );
+        // Cache the results for 1 hour
+        _cache.set(cacheKey, commits, duration: _cacheDuration);
+
         return commits;
-      } else {
-        print(
-          '❌ BottomWidgets: GitHub API returned status ${response.statusCode}',
-        );
       }
       return [];
     } catch (e) {
-      print('❌ BottomWidgets: Error fetching commits: $e');
+      // Try to return stale cached data on error
+      final staleCache = _cache.get<List<GitHubCommit>>(cacheKey);
+      if (staleCache != null) {
+        return staleCache;
+      }
+
       return [];
     }
   }

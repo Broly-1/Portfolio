@@ -71,57 +71,41 @@ class _FooterState extends State<Footer> with SingleTickerProviderStateMixin {
   }
 
   Future<void> _fetchSocialLinks() async {
-    print('🔍 Footer: Fetching social links from Firebase...');
     final aboutData = await _firebaseService.getAboutData();
-    print('📊 Footer: About data received: $aboutData');
     if (mounted && aboutData != null) {
       setState(() {
         _githubUrl = aboutData['github'] as String?;
         _linkedinUrl = aboutData['linkedin'] as String?;
       });
-      print('🔗 Footer: GitHub URL: $_githubUrl');
-      print('🔗 Footer: LinkedIn URL: $_linkedinUrl');
       // Fetch latest commit after we have the GitHub URL
       if (_githubUrl != null) {
-        print('✅ Footer: GitHub URL found, fetching latest commit...');
         _fetchLatestCommit();
-      } else {
-        print('⚠️ Footer: No GitHub URL found in Firebase data');
       }
-    } else {
-      print('❌ Footer: No about data received or widget not mounted');
     }
   }
 
   Future<void> _fetchLatestCommit() async {
     if (_githubUrl == null) {
-      print('⚠️ Footer: _fetchLatestCommit called but _githubUrl is null');
       return;
     }
 
     try {
-      print('🔍 Footer: Parsing GitHub URL: $_githubUrl');
       // Extract username from GitHub URL
       final uri = Uri.parse(_githubUrl!);
       final username = uri.pathSegments.isNotEmpty
           ? uri.pathSegments.last
           : null;
 
-      print('👤 Footer: Extracted username: $username');
       if (username == null) {
-        print('❌ Footer: Failed to extract username from URL');
         return;
       }
 
       // Fetch latest public events from GitHub
       final apiUrl = 'https://api.github.com/users/$username/events/public';
-      print('📡 Footer: Fetching from GitHub API: $apiUrl');
       final response = await http.get(Uri.parse(apiUrl));
 
-      print('📊 Footer: GitHub API response status: ${response.statusCode}');
       if (response.statusCode == 200) {
         final events = json.decode(response.body) as List;
-        print('📦 Footer: Received ${events.length} events');
 
         // Find the first PushEvent
         bool foundCommit = false;
@@ -130,32 +114,23 @@ class _FooterState extends State<Footer> with SingleTickerProviderStateMixin {
             final repo = event['repo']['name'];
             final payload = event['payload'];
             if (payload != null && payload['head'] != null) {
-              print('💾 Footer: Found PushEvent in repo: $repo');
               final sha = payload['head'];
               final commitUrl = 'https://github.com/$repo/commit/$sha';
               final shortHash = sha.substring(0, 7);
-              print('✅ Footer: Latest commit hash: $shortHash');
-              print('🔗 Footer: Commit URL: $commitUrl');
               if (mounted) {
                 setState(() {
                   _latestCommitUrl = commitUrl;
                   _latestCommitHash = shortHash;
                 });
-                print('✨ Footer: State updated with commit hash');
               }
               foundCommit = true;
               break;
             }
           }
         }
-        if (!foundCommit) {
-          print('⚠️ Footer: No PushEvent found in recent events');
-        }
-      } else {
-        print('❌ Footer: GitHub API returned status ${response.statusCode}');
       }
     } catch (e) {
-      print('❌ Footer: Error fetching GitHub commit: $e');
+      // Error fetching GitHub commit
     }
   }
 

@@ -14,9 +14,13 @@ class ProjectsScreen extends StatefulWidget {
   State<ProjectsScreen> createState() => _ProjectsScreenState();
 }
 
-class _ProjectsScreenState extends State<ProjectsScreen> {
+class _ProjectsScreenState extends State<ProjectsScreen>
+    with AutomaticKeepAliveClientMixin {
   final FirebaseService _firebaseService = FirebaseService();
   String? _expandedProjectId;
+
+  @override
+  bool get wantKeepAlive => true;
 
   @override
   void initState() {
@@ -26,6 +30,7 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    super.build(context);
     return StreamBuilder<List<Project>>(
       stream: _firebaseService.streamProjects(),
       builder: (context, snapshot) {

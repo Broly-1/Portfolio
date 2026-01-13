@@ -54,13 +54,24 @@ final GoRouter _router = GoRouter(
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp.router(
       routerConfig: _router,
       darkTheme: AppTheme.dark,
       themeMode: ThemeMode.dark,
-      debugShowCheckedModeBanner: true,
+      debugShowCheckedModeBanner: false,
+      // Performance optimizations
+      builder: (context, child) {
+        return MediaQuery(
+          data: MediaQuery.of(context).copyWith(
+            textScaler:
+                TextScaler.noScaling, // Prevent system font scaling issues
+          ),
+          child: child!,
+        );
+      },
     );
   }
 }

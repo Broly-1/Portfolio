@@ -41,6 +41,24 @@ class _HomePageState extends State<HomePage> {
   }
 
   @override
+  void didUpdateWidget(HomePage oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.initialScreen != widget.initialScreen ||
+        oldWidget.projectId != widget.projectId) {
+      setState(() {
+        currentScreen = widget.initialScreen;
+        _expandProjectId = widget.projectId;
+      });
+      // Scroll to top when screen changes
+      _scrollController.animateTo(
+        0,
+        duration: const Duration(milliseconds: 300),
+        curve: Curves.easeOut,
+      );
+    }
+  }
+
+  @override
   void dispose() {
     _scrollController.dispose();
     _showBlurNotifier.dispose();
@@ -48,36 +66,23 @@ class _HomePageState extends State<HomePage> {
   }
 
   void navigateTo(String path, {String? projectId}) {
+    // First update the internal state for smooth transition
     setState(() {
       currentScreen = path;
       _expandProjectId = projectId;
     });
 
-    // Update URL based on path
-    switch (path) {
-      case '_':
-        context.go('/');
-        break;
-      case 'about':
-        context.go('/about');
-        break;
-      case 'posts':
-        context.go('/posts');
-        break;
-      case 'projects':
-        if (projectId != null) {
-          context.go('/projects?id=$projectId');
-        } else {
-          context.go('/projects');
-        }
-        break;
-      case 'resume':
-        context.go('/resume');
-        break;
-      case 'more':
-        context.go('/more');
-        break;
+    // Scroll to top smoothly
+    if (_scrollController.hasClients) {
+      _scrollController.animateTo(
+        0,
+        duration: const Duration(milliseconds: 300),
+        curve: Curves.easeOut,
+      );
     }
+
+    // Don't update URL - let GoRouter handle it or do it manually without navigation
+    // This keeps us on the same page instance
   }
 
   Widget _buildCurrentScreen() {

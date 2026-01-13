@@ -30,17 +30,14 @@ class _BottomWidgetsState extends State<BottomWidgets>
   }
 
   Future<void> _fetchCommits() async {
-    print('🚀 BottomWidgets: _fetchCommits called');
     if (!mounted) return;
     setState(() => _isLoadingCommits = true);
-    final commits = await _githubService.getRecentCommits(count: 3);
-    print('📥 BottomWidgets: Received ${commits.length} commits from service');
+    final commits = await _githubService.getRecentCommits(count: 5);
     if (!mounted) return;
     setState(() {
       _commits = commits;
       _isLoadingCommits = false;
     });
-    print('💾 BottomWidgets: State updated with ${commits.length} commits');
   }
 
   @override
@@ -479,7 +476,7 @@ class _BottomWidgetsState extends State<BottomWidgets>
       child: Row(
         children: [
           Text(
-            'Broly-1:',
+            '${commit.repoName}:',
             style: TextStyle(
               fontSize: 14 * widget.scale,
               color: Colors.white.withOpacity(0.9),
@@ -531,33 +528,49 @@ class _BottomWidgetsState extends State<BottomWidgets>
   }
 
   Widget _buildLanguageBar(ThemeProvider themeProvider) {
-    // Simulated language distribution bar
-    return Container(
-      height: 8 * widget.scale,
-      width: 150 * widget.scale,
+    // Language distribution with colors
+    final languages = [
+      {'name': 'Dart', 'color': const Color(0xFF00D4FF), 'percent': 60},
+      {'name': 'Kotlin', 'color': const Color(0xFFFF6B35), 'percent': 20},
+      {'name': 'Swift', 'color': const Color(0xFF5B8DEE), 'percent': 15},
+      {'name': 'C++', 'color': const Color(0xFFFF5722), 'percent': 3},
+      {'name': 'CMake', 'color': const Color(0xFF8BC34A), 'percent': 1},
+      {'name': 'HTML', 'color': const Color(0xFFFFC107), 'percent': 1},
+    ];
+
+    return Tooltip(
+      message: languages
+          .map((lang) => '${lang['name']} ${lang['percent']}%')
+          .join('\n'),
+      preferBelow: false,
+      textStyle: TextStyle(fontSize: 12 * widget.scale, color: Colors.white),
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(4 * widget.scale),
+        color: const Color(0xFF1E1E2E),
+        borderRadius: BorderRadius.circular(8 * widget.scale),
+        border: Border.all(color: Colors.white.withOpacity(0.1)),
       ),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(4 * widget.scale),
-        child: Row(
-          children: [
-            Expanded(
-              flex: 60,
-              child: Container(color: const Color(0xFF00D4FF)),
+      padding: EdgeInsets.all(12 * widget.scale),
+      child: MouseRegion(
+        cursor: SystemMouseCursors.help,
+        child: Container(
+          height: 8 * widget.scale,
+          width: 150 * widget.scale,
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(4 * widget.scale),
+          ),
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(4 * widget.scale),
+            child: Row(
+              children: languages
+                  .map(
+                    (lang) => Expanded(
+                      flex: lang['percent'] as int,
+                      child: Container(color: lang['color'] as Color),
+                    ),
+                  )
+                  .toList(),
             ),
-            Expanded(
-              flex: 20,
-              child: Container(color: const Color(0xFFFF6B35)),
-            ),
-            Expanded(
-              flex: 15,
-              child: Container(color: const Color(0xFF5B8DEE)),
-            ),
-            Expanded(flex: 3, child: Container(color: const Color(0xFFFF5722))),
-            Expanded(flex: 1, child: Container(color: const Color(0xFF8BC34A))),
-            Expanded(flex: 1, child: Container(color: const Color(0xFFFFC107))),
-          ],
+          ),
         ),
       ),
     );
