@@ -31,9 +31,11 @@ class _BottomWidgetsState extends State<BottomWidgets>
 
   Future<void> _fetchCommits() async {
     print('🚀 BottomWidgets: _fetchCommits called');
+    if (!mounted) return;
     setState(() => _isLoadingCommits = true);
     final commits = await _githubService.getRecentCommits(count: 3);
     print('📥 BottomWidgets: Received ${commits.length} commits from service');
+    if (!mounted) return;
     setState(() {
       _commits = commits;
       _isLoadingCommits = false;

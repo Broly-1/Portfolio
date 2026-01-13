@@ -76,7 +76,7 @@ class _NavigationIndicatorState extends State<NavigationIndicator>
   Widget build(BuildContext context) {
     final themeProvider = Provider.of<ThemeProvider>(context);
     final isLightTheme = themeProvider.selectedTheme != 'Mocha';
-    final textColor = isLightTheme ? Colors.black87 : Colors.white;
+    final textColor = isLightTheme ? Colors.black87 : Colors.grey[400]!;
     final accentColor = themeProvider.accentColor;
     final scale = context.responsiveScale;
     final isMobile = context.isMobile;

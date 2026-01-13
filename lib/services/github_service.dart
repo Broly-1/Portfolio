@@ -75,10 +75,7 @@ class GitHubService {
                     'https://api.github.com/repos/$repo/commits/$sha';
                 final commitResponse = await http.get(
                   Uri.parse(commitUrl),
-                  headers: {
-                    'Authorization': 'Bearer $_token',
-                    'Accept': 'application/vnd.github.v3+json',
-                  },
+                  headers: {'Accept': 'application/vnd.github.v3+json'},
                 );
 
                 if (commitResponse.statusCode == 200) {

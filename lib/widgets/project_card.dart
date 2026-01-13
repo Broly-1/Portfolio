@@ -20,18 +20,27 @@ class _ProjectCardState extends State<ProjectCard> {
 
   @override
   Widget build(BuildContext context) {
-    final themeProvider = Provider.of<ThemeProvider>(context, listen: false);
-    final isLightTheme = themeProvider.selectedTheme != 'Mocha';
-    final borderColor = isLightTheme ? Colors.black26 : const Color(0xFF313244);
     final scale = context.responsiveScale;
     final isMobile = context.isMobile;
 
-    final cardBackground = isLightTheme
-        ? Color.lerp(themeProvider.themeBackgroundColor, Colors.black, 0.05)!
-        : Color.lerp(themeProvider.themeBackgroundColor, Colors.black, 0.2)!;
-
     return Consumer<ThemeProvider>(
       builder: (context, themeProvider, child) {
+        final isLightTheme = themeProvider.selectedTheme != 'Mocha';
+        final borderColor = isLightTheme
+            ? Colors.black26
+            : const Color(0xFF313244);
+        final cardBackground = isLightTheme
+            ? Color.lerp(
+                themeProvider.themeBackgroundColor,
+                Colors.black,
+                0.05,
+              )!
+            : Color.lerp(
+                themeProvider.themeBackgroundColor,
+                Colors.black,
+                0.2,
+              )!;
+
         return MouseRegion(
           onEnter: (_) => setState(() => _isHovered = true),
           onExit: (_) => setState(() => _isHovered = false),
@@ -69,23 +78,25 @@ class _ProjectCardState extends State<ProjectCard> {
                         ),
                       ],
                     )
-                  : child!,
+                  : Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        // Left side - Content
+                        Expanded(flex: 4, child: _buildContent(context, scale)),
+
+                        SizedBox(width: 13 * scale),
+
+                        // Right side - Phone mockup
+                        Expanded(
+                          flex: 2,
+                          child: _buildMobileScreen(context, scale),
+                        ),
+                      ],
+                    ),
             ),
           ),
         );
       },
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Left side - Content
-          Expanded(flex: 4, child: _buildContent(context, scale)),
-
-          SizedBox(width: 13 * scale),
-
-          // Right side - Phone mockup
-          Expanded(flex: 2, child: _buildMobileScreen(context, scale)),
-        ],
-      ),
     );
   }
 
@@ -94,6 +105,7 @@ class _ProjectCardState extends State<ProjectCard> {
     final isLightTheme = themeProvider.selectedTheme != 'Mocha';
     final textColor = isLightTheme ? Colors.grey[700]! : Colors.grey[300]!;
     final dateStr = DateFormat('MMM d, y').format(widget.project.createdAt);
+    final isMobile = context.isMobile;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -189,12 +201,12 @@ class _ProjectCardState extends State<ProjectCard> {
                           // Description in browser - fixed height for consistency
                           SizedBox(
                             height:
-                                48 *
+                                60 *
                                 scale, // Increased height for better visibility
                             child: Text(
                               widget.project.description,
                               style: TextStyle(
-                                fontSize: 13 * scale,
+                                fontSize: 15 * scale,
                                 color: Colors.grey[400],
                                 height: 1.5,
                               ),
@@ -290,7 +302,7 @@ class _ProjectCardState extends State<ProjectCard> {
         Text(
           _extractTextPreview(widget.project.content),
           style: TextStyle(
-            fontSize: 12 * scale,
+            fontSize: 14 * scale,
             color: textColor.withOpacity(0.7),
             height: 1.5,
             letterSpacing: 0.9,
@@ -303,27 +315,49 @@ class _ProjectCardState extends State<ProjectCard> {
 
         // Tags at bottom with random colors
         Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Icon(
               Icons.local_offer_outlined,
-              size: 13 * scale,
+              size: isMobile ? 13 * scale : 24 * scale,
               color: textColor.withOpacity(0.5),
             ),
-            SizedBox(width: 5 * scale),
+            SizedBox(width: isMobile ? 5 * scale : 8 * scale),
             Expanded(
-              child: Wrap(
-                spacing: 6 * scale,
-                runSpacing: 5 * scale,
-                children: widget.project.tags.map((tag) {
-                  return Text(
-                    tag,
-                    style: TextStyle(
-                      fontSize: 11 * scale,
-                      color: _getTagColor(tag),
-                      fontWeight: FontWeight.w500,
-                    ),
-                  );
-                }).toList(),
+              child: SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: Row(
+                  children: widget.project.tags.take(4).map((tag) {
+                    final tagColor = _getTagColor(tag);
+                    return Padding(
+                      padding: EdgeInsets.only(
+                        right: isMobile ? 6 * scale : 8 * scale,
+                      ),
+                      child: Container(
+                        padding: EdgeInsets.symmetric(
+                          horizontal: isMobile ? 8 * scale : 12 * scale,
+                          vertical: isMobile ? 4 * scale : 6 * scale,
+                        ),
+                        decoration: BoxDecoration(
+                          color: isLightTheme
+                              ? Colors.grey[800]
+                              : const Color(0xFF313244),
+                          borderRadius: BorderRadius.circular(
+                            isMobile ? 4 * scale : 6 * scale,
+                          ),
+                        ),
+                        child: Text(
+                          tag,
+                          style: TextStyle(
+                            fontSize: isMobile ? 11 * scale : 13 * scale,
+                            color: tagColor,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ),
+                    );
+                  }).toList(),
+                ),
               ),
             ),
           ],

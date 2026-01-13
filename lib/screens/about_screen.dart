@@ -41,7 +41,7 @@ class _AboutContentState extends State<AboutContent> {
   Widget build(BuildContext context) {
     final themeProvider = Provider.of<ThemeProvider>(context);
     final isLightTheme = themeProvider.selectedTheme != 'Mocha';
-    final textColor = isLightTheme ? Colors.black87 : Colors.white;
+    final textColor = isLightTheme ? Colors.black87 : Colors.grey[400]!;
 
     if (_isLoading) {
       return const Center(child: CircularProgressIndicator());
@@ -53,8 +53,8 @@ class _AboutContentState extends State<AboutContent> {
         Text(
           'About Me',
           style: context.textStyle.titleLgBold.copyWith(
-            fontSize: context.isMobile ? 32 : 42,
-            letterSpacing: 3,
+            fontSize: context.isMobile ? 24 : 42,
+            letterSpacing: context.isMobile ? 2 : 3,
             color: textColor,
           ),
         ),
@@ -188,8 +188,8 @@ class _AboutContentState extends State<AboutContent> {
   Widget _buildAboutText(BuildContext context) {
     final themeProvider = Provider.of<ThemeProvider>(context);
     final isLightTheme = themeProvider.selectedTheme != 'Mocha';
-    final textColor = isLightTheme ? Colors.black87 : Colors.grey[300]!;
-    final iconColor = isLightTheme ? Colors.grey[700]! : Colors.grey[400]!;
+    final textColor = isLightTheme ? Colors.black87 : Colors.grey[400]!;
+    final iconColor = isLightTheme ? Colors.grey[700]! : Colors.grey[500]!;
 
     final bio = _aboutData?['bio'] as String? ?? 'Loading...';
     final location = _aboutData?['location'] as String? ?? '';
@@ -199,9 +199,9 @@ class _AboutContentState extends State<AboutContent> {
 
     final textStyle = context.textStyle.bodyLgMedium.copyWith(
       height: 1.8,
-      fontSize: 20,
+      fontSize: context.isMobile ? 14 : 20,
       color: textColor,
-      letterSpacing: 1.7,
+      letterSpacing: context.isMobile ? 0.5 : 1.7,
     );
 
     return Column(
