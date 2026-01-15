@@ -3,6 +3,7 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'dart:io';
 import 'package:hassankamran/models/project.dart';
 import 'package:hassankamran/models/home_content.dart';
+import 'package:hassankamran/models/app_stats.dart';
 import 'cache_service.dart';
 
 class FirebaseService {
@@ -14,6 +15,7 @@ class FirebaseService {
   static const String _aboutCollection = 'about';
   static const String _projectsCollection = 'projects';
   static const String _homeContentCollection = 'homeContent';
+  static const String _appStatsCollection = 'appStats';
 
   // Get About data
   Future<Map<String, dynamic>?> getAboutData() async {
@@ -261,6 +263,56 @@ class FirebaseService {
           .collection(_homeContentCollection)
           .doc('main')
           .set(content.toFirestore());
+
+      return true;
+    } catch (e) {
+      return false;
+    }
+  }
+
+  // Get App Stats
+  Future<AppStats?> getAppStats() async {
+    const cacheKey = 'app_stats';
+
+    // Check cache first
+    if (_cache.has(cacheKey)) {
+      return _cache.get(cacheKey);
+    }
+
+    try {
+      final doc = await _firestore
+          .collection(_appStatsCollection)
+          .doc('main')
+          .get();
+
+      if (doc.exists && doc.data() != null) {
+        final stats = AppStats.fromFirestore(doc.data()!, doc.id);
+        _cache.set(cacheKey, stats, duration: const Duration(minutes: 15));
+        return stats;
+      }
+      return null;
+    } catch (e) {
+      return null;
+    }
+  }
+
+  // Update App Stats
+  Future<bool> updateAppStats(int iosDownloads, int androidDownloads) async {
+    try {
+      final stats = AppStats(
+        id: 'main',
+        iosDownloads: iosDownloads,
+        androidDownloads: androidDownloads,
+        lastUpdated: DateTime.now(),
+      );
+
+      await _firestore
+          .collection(_appStatsCollection)
+          .doc('main')
+          .set(stats.toFirestore());
+
+      // Clear cache
+      _cache.clear();
 
       return true;
     } catch (e) {

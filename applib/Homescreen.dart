@@ -4,6 +4,7 @@ import 'screens/edit_about_screen.dart';
 import 'screens/manage_projects_screen.dart';
 import 'screens/edit_home_screen.dart';
 import 'screens/edit_resume_screen.dart';
+import 'screens/edit_stats_screen.dart';
 
 class AdminHomeScreen extends StatelessWidget {
   const AdminHomeScreen({super.key});
@@ -136,6 +137,20 @@ class AdminHomeScreen extends StatelessWidget {
                 ScaffoldMessenger.of(
                   context,
                 ).showSnackBar(const SnackBar(content: Text('Coming soon!')));
+              },
+            ),
+            _buildAdminCard(
+              context,
+              title: 'App Downloads',
+              icon: Icons.download,
+              description: 'Update iOS and Android download counts',
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const EditStatsScreen(),
+                  ),
+                );
               },
             ),
             _buildAdminCard(

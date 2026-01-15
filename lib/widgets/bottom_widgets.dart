@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:hassankamran/services/github_service.dart';
+import 'package:hassankamran/widgets/downloads_widget.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../styles/theme_provider.dart';
@@ -32,7 +33,7 @@ class _BottomWidgetsState extends State<BottomWidgets>
   Future<void> _fetchCommits() async {
     if (!mounted) return;
     setState(() => _isLoadingCommits = true);
-    final commits = await _githubService.getRecentCommits(count: 5);
+    final commits = await _githubService.getRecentCommits(count: 4);
     if (!mounted) return;
     setState(() {
       _commits = commits;
@@ -56,6 +57,12 @@ class _BottomWidgetsState extends State<BottomWidgets>
     // Small cards (Theme & Connect) together = one project card width
     final smallCardWidth = (projectCardWidth - spacing) / 2;
 
+    // Downloads widget is square, same height as commits
+    final downloadsSquareSize = 250.0 * widget.scale;
+    // Commits width is adjusted to fit beside downloads within projectCardWidth total
+    final commitsWidthWithDownloads =
+        projectCardWidth - spacing - downloadsSquareSize;
+
     if (isMobile) {
       // Mobile: stack vertically
       return Column(
@@ -65,6 +72,12 @@ class _BottomWidgetsState extends State<BottomWidgets>
           _buildConnectCard(context, true, double.infinity),
           SizedBox(height: spacing),
           _buildCommitsCard(context, true, double.infinity),
+          SizedBox(height: spacing),
+          DownloadsWidget(
+            scale: widget.scale,
+            cardWidth: double.infinity,
+            isMobile: true,
+          ),
         ],
       );
     }
@@ -82,7 +95,18 @@ class _BottomWidgetsState extends State<BottomWidgets>
             _buildConnectCard(context, false, smallCardWidth),
           ],
         ),
-        _buildCommitsCard(context, false, projectCardWidth),
+        Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            _buildCommitsCard(context, false, projectCardWidth),
+            SizedBox(width: spacing),
+            DownloadsWidget(
+              scale: widget.scale,
+              cardWidth: downloadsSquareSize,
+              isMobile: false,
+            ),
+          ],
+        ),
       ],
     );
   }
@@ -275,7 +299,8 @@ class _BottomWidgetsState extends State<BottomWidgets>
           Consumer<ThemeProvider>(
             builder: (context, themeProvider, child) {
               return InkWell(
-                onTap: () => _launchUrl('https://cal.com'),
+                onTap: () =>
+                    _launchUrl('https://cal.com/hassan-kamran-uaea8u/30min'),
                 borderRadius: BorderRadius.circular(8 * widget.scale),
                 child: Container(
                   width: double.infinity,
@@ -400,19 +425,8 @@ class _BottomWidgetsState extends State<BottomWidgets>
           else
             ...(isMobile
                 ? [
-                    Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: _commits
-                          .map(
-                            (commit) =>
-                                _buildCommitRow(context, commit, isMobile),
-                          )
-                          .toList(),
-                    ),
-                  ]
-                : [
-                    Expanded(
-                      child: Center(
+                    Flexible(
+                      child: SingleChildScrollView(
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: _commits
@@ -421,6 +435,26 @@ class _BottomWidgetsState extends State<BottomWidgets>
                                     _buildCommitRow(context, commit, isMobile),
                               )
                               .toList(),
+                        ),
+                      ),
+                    ),
+                  ]
+                : [
+                    Expanded(
+                      child: SingleChildScrollView(
+                        child: Center(
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: _commits
+                                .map(
+                                  (commit) => _buildCommitRow(
+                                    context,
+                                    commit,
+                                    isMobile,
+                                  ),
+                                )
+                                .toList(),
+                          ),
                         ),
                       ),
                     ),
@@ -538,38 +572,41 @@ class _BottomWidgetsState extends State<BottomWidgets>
       {'name': 'HTML', 'color': const Color(0xFFFFC107), 'percent': 1},
     ];
 
-    return Tooltip(
-      message: languages
-          .map((lang) => '${lang['name']} ${lang['percent']}%')
-          .join('\n'),
-      preferBelow: false,
-      textStyle: TextStyle(fontSize: 12 * widget.scale, color: Colors.white),
-      decoration: BoxDecoration(
-        color: const Color(0xFF1E1E2E),
-        borderRadius: BorderRadius.circular(8 * widget.scale),
-        border: Border.all(color: Colors.white.withOpacity(0.1)),
-      ),
-      padding: EdgeInsets.all(12 * widget.scale),
-      child: MouseRegion(
-        cursor: SystemMouseCursors.help,
-        child: Container(
-          height: 8 * widget.scale,
-          width: 150 * widget.scale,
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(4 * widget.scale),
-          ),
-          child: ClipRRect(
-            borderRadius: BorderRadius.circular(4 * widget.scale),
-            child: Row(
-              children: languages
-                  .map(
-                    (lang) => Expanded(
-                      flex: lang['percent'] as int,
+    return MouseRegion(
+      cursor: SystemMouseCursors.help,
+      child: Container(
+        height: 8 * widget.scale,
+        width: 150 * widget.scale,
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(4 * widget.scale),
+        ),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(4 * widget.scale),
+          child: Row(
+            children: languages
+                .map(
+                  (lang) => Expanded(
+                    flex: lang['percent'] as int,
+                    child: Tooltip(
+                      message: '${lang['name']} ${lang['percent']}%',
+                      preferBelow: false,
+                      textStyle: TextStyle(
+                        fontSize: 12 * widget.scale,
+                        color: Colors.white,
+                      ),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFF1E1E2E),
+                        borderRadius: BorderRadius.circular(8 * widget.scale),
+                        border: Border.all(
+                          color: Colors.white.withOpacity(0.1),
+                        ),
+                      ),
+                      padding: EdgeInsets.all(12 * widget.scale),
                       child: Container(color: lang['color'] as Color),
                     ),
-                  )
-                  .toList(),
-            ),
+                  ),
+                )
+                .toList(),
           ),
         ),
       ),
