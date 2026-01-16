@@ -348,4 +348,30 @@ class FirebaseService {
       return false;
     }
   }
+
+  // Get generic config data
+  Future<Map<String, dynamic>?> getConfig(String docId) async {
+    final cacheKey = 'config_$docId';
+
+    // Check cache first
+    if (_cache.has(cacheKey)) {
+      return _cache.get(cacheKey);
+    }
+
+    try {
+      final doc = await _firestore
+          .collection(_configCollection)
+          .doc(docId)
+          .get();
+
+      if (doc.exists && doc.data() != null) {
+        final data = doc.data();
+        _cache.set(cacheKey, data, duration: const Duration(hours: 1));
+        return data;
+      }
+      return null;
+    } catch (e) {
+      return null;
+    }
+  }
 }

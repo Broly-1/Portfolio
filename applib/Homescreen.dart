@@ -6,6 +6,7 @@ import 'screens/edit_home_screen.dart';
 import 'screens/edit_resume_screen.dart';
 import 'screens/edit_stats_screen.dart';
 import 'screens/github_token_screen.dart';
+import 'screens/edit_location_screen.dart';
 
 class AdminHomeScreen extends StatelessWidget {
   const AdminHomeScreen({super.key});
@@ -164,6 +165,20 @@ class AdminHomeScreen extends StatelessWidget {
                   context,
                   MaterialPageRoute(
                     builder: (context) => const GitHubTokenScreen(),
+                  ),
+                );
+              },
+            ),
+            _buildAdminCard(
+              context,
+              title: 'Location',
+              icon: Icons.location_on,
+              description: 'Edit map location and name',
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const EditLocationScreen(),
                   ),
                 );
               },

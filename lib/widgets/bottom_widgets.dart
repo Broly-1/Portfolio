@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:hassankamran/services/github_service.dart';
 import 'package:hassankamran/widgets/downloads_widget.dart';
+import 'package:hassankamran/widgets/location_map_widget.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../styles/theme_provider.dart';
@@ -70,6 +71,12 @@ class _BottomWidgetsState extends State<BottomWidgets>
           SizedBox(height: spacing),
           _buildCommitsCard(context, true, double.infinity),
           SizedBox(height: spacing),
+          LocationMapWidget(
+            scale: widget.scale,
+            cardWidth: double.infinity,
+            isMobile: true,
+          ),
+          SizedBox(height: spacing),
           DownloadsWidget(
             scale: widget.scale,
             cardWidth: double.infinity,
@@ -92,10 +99,15 @@ class _BottomWidgetsState extends State<BottomWidgets>
             _buildConnectCard(context, false, smallCardWidth),
           ],
         ),
+        _buildCommitsCard(context, false, projectCardWidth),
         Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            _buildCommitsCard(context, false, projectCardWidth),
+            LocationMapWidget(
+              scale: widget.scale,
+              cardWidth: downloadsSquareSize,
+              isMobile: false,
+            ),
             SizedBox(width: spacing),
             DownloadsWidget(
               scale: widget.scale,
@@ -258,7 +270,7 @@ class _BottomWidgetsState extends State<BottomWidgets>
       width: cardWidth,
       padding: EdgeInsets.all(24 * widget.scale),
       decoration: BoxDecoration(
-        color: const Color(0xFF2A2A3E),
+        color: const Color(0xFF1A1B26),
         borderRadius: BorderRadius.circular(16 * widget.scale),
         border: Border.all(color: Colors.white.withOpacity(0.1), width: 1),
       ),
