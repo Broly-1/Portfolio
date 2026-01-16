@@ -16,6 +16,35 @@ class FirebaseService {
   static const String _projectsCollection = 'projects';
   static const String _homeContentCollection = 'homeContent';
   static const String _appStatsCollection = 'appStats';
+  static const String _configCollection = 'config';
+
+  // Get GitHub Token
+  Future<String?> getGitHubToken() async {
+    const cacheKey = 'github_token';
+
+    // Check cache first
+    if (_cache.has(cacheKey)) {
+      return _cache.get(cacheKey);
+    }
+
+    try {
+      final doc = await _firestore
+          .collection(_configCollection)
+          .doc('github')
+          .get();
+
+      if (doc.exists && doc.data() != null) {
+        final token = doc.data()!['token'] as String?;
+        if (token != null) {
+          _cache.set(cacheKey, token, duration: const Duration(hours: 24));
+        }
+        return token;
+      }
+      return null;
+    } catch (e) {
+      return null;
+    }
+  }
 
   // Get About data
   Future<Map<String, dynamic>?> getAboutData() async {

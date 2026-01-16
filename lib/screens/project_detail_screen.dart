@@ -218,120 +218,122 @@ class ProjectDetailScreen extends StatelessWidget {
                       ),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              // Browser header
-                              Container(
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 16,
-                                  vertical: 12,
-                                ),
-                                decoration: BoxDecoration(
-                                  color: isLightTheme
-                                      ? const Color(0xFF3D3D3D)
-                                      : const Color(0xFF2D2D3D),
-                                  borderRadius: const BorderRadius.vertical(
-                                    top: Radius.circular(12),
-                                  ),
-                                ),
-                                child: Row(
-                                  children: [
-                                    _buildDot(const Color(0xFFF38BA8)),
-                                    const SizedBox(width: 8),
-                                    _buildDot(const Color(0xFFF9E2AF)),
-                                    const SizedBox(width: 8),
-                                    _buildDot(const Color(0xFFA6E3A1)),
-                                  ],
-                                ),
+                          // Browser header
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 16,
+                              vertical: 10,
+                            ),
+                            decoration: BoxDecoration(
+                              color: isLightTheme
+                                  ? const Color(0xFF3D3D3D)
+                                  : const Color(0xFF2D2D3D),
+                              borderRadius: const BorderRadius.vertical(
+                                top: Radius.circular(12),
                               ),
-                              // Browser content
-                              Padding(
-                                padding: const EdgeInsets.all(20),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    // Repo name
-                                    RichText(
-                                      text: TextSpan(
-                                        children: [
-                                          TextSpan(
-                                            text: 'Broly-1',
-                                            style: const TextStyle(
-                                              fontSize: 16,
-                                              color: Color(0xFFF38BA8),
-                                              fontWeight: FontWeight.w500,
-                                            ),
-                                          ),
-                                          TextSpan(
-                                            text: ' / ',
-                                            style: TextStyle(
-                                              fontSize: 16,
-                                              color: Colors.white.withOpacity(
-                                                0.5,
-                                              ),
-                                            ),
-                                          ),
-                                          TextSpan(
-                                            text: project.name,
-                                            style: TextStyle(
-                                              fontSize: 16,
-                                              color: themeProvider.accentColor,
-                                              fontWeight: FontWeight.bold,
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                    const SizedBox(height: 12),
-                                    // Description
-                                    Text(
-                                      project.description,
-                                      style: TextStyle(
-                                        fontSize: 14,
-                                        color: Colors.white.withOpacity(0.8),
-                                      ),
-                                      maxLines: 3,
-                                      overflow: TextOverflow.ellipsis,
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ],
-                          ),
-                          // User info at bottom
-                          Padding(
-                            padding: const EdgeInsets.all(20),
+                            ),
                             child: Row(
                               children: [
-                                Container(
-                                  width: 40,
-                                  height: 40,
-                                  decoration: BoxDecoration(
-                                    shape: BoxShape.circle,
-                                    border: Border.all(
-                                      color: Colors.white,
-                                      width: 2,
-                                    ),
-                                    image: const DecorationImage(
-                                      image: NetworkImage(
-                                        'https://avatars.githubusercontent.com/u/62743581?v=4',
-                                      ),
-                                      fit: BoxFit.cover,
-                                    ),
-                                  ),
-                                ),
-                                const SizedBox(width: 12),
-                                Text(
-                                  'Broly-1',
-                                  style: TextStyle(
-                                    fontSize: 14,
-                                    color: Colors.white.withOpacity(0.7),
-                                  ),
-                                ),
+                                _buildDot(const Color(0xFFF38BA8)),
+                                const SizedBox(width: 8),
+                                _buildDot(const Color(0xFFF9E2AF)),
+                                const SizedBox(width: 8),
+                                _buildDot(const Color(0xFFA6E3A1)),
                               ],
+                            ),
+                          ),
+                          Expanded(
+                            child: Padding(
+                              padding: const EdgeInsets.all(16),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      // Repo name
+                                      RichText(
+                                        text: TextSpan(
+                                          children: [
+                                            TextSpan(
+                                              text: 'Broly-1',
+                                              style: const TextStyle(
+                                                fontSize: 14,
+                                                color: Color(0xFFF38BA8),
+                                                fontWeight: FontWeight.w500,
+                                              ),
+                                            ),
+                                            TextSpan(
+                                              text: ' / ',
+                                              style: TextStyle(
+                                                fontSize: 14,
+                                                color: Colors.white.withOpacity(
+                                                  0.5,
+                                                ),
+                                              ),
+                                            ),
+                                            TextSpan(
+                                              text: project.name,
+                                              style: TextStyle(
+                                                fontSize: 14,
+                                                color:
+                                                    themeProvider.accentColor,
+                                                fontWeight: FontWeight.bold,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                      const SizedBox(height: 8),
+                                      // Description
+                                      Text(
+                                        project.description,
+                                        style: TextStyle(
+                                          fontSize: 12,
+                                          color: Colors.white.withOpacity(0.8),
+                                        ),
+                                        maxLines: 2,
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
+                                    ],
+                                  ),
+                                  // User info at bottom
+                                  Row(
+                                    children: [
+                                      Container(
+                                        width: 32,
+                                        height: 32,
+                                        decoration: BoxDecoration(
+                                          shape: BoxShape.circle,
+                                          border: Border.all(
+                                            color: Colors.white,
+                                            width: 2,
+                                          ),
+                                          image: const DecorationImage(
+                                            image: NetworkImage(
+                                              'https://avatars.githubusercontent.com/u/62743581?v=4',
+                                            ),
+                                            fit: BoxFit.cover,
+                                          ),
+                                        ),
+                                      ),
+                                      const SizedBox(width: 10),
+                                      Text(
+                                        'Broly-1',
+                                        style: TextStyle(
+                                          fontSize: 12,
+                                          color: Colors.white.withOpacity(0.7),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                              ),
                             ),
                           ),
                         ],

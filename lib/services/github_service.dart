@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'cache_service.dart';
+import 'firebase_service.dart';
 
 class GitHubCommit {
   final String message;
@@ -49,6 +50,7 @@ class GitHubCommit {
 class GitHubService {
   static const String _username = 'Broly-1';
   final CacheService _cache = CacheService();
+  final FirebaseService _firebaseService = FirebaseService();
   static const _cacheDuration = Duration(
     hours: 1,
   ); // Cache for 1 hour to reduce API calls
@@ -64,11 +66,17 @@ class GitHubService {
     try {
       final apiUrl = 'https://api.github.com/users/$_username/events/public';
 
+      // Get GitHub token from Firebase
+      final token = await _firebaseService.getGitHubToken();
+
+      // Build headers with optional authentication
+      final headers = {
+        'Accept': 'application/vnd.github.v3+json',
+        if (token != null) 'Authorization': 'Bearer $token',
+      };
+
       final response = await http
-          .get(
-            Uri.parse(apiUrl),
-            headers: {'Accept': 'application/vnd.github.v3+json'},
-          )
+          .get(Uri.parse(apiUrl), headers: headers)
           .timeout(
             const Duration(seconds: 10),
             onTimeout: () {
@@ -100,7 +108,6 @@ class GitHubService {
 
             if (payload != null && payload['head'] != null) {
               final sha = payload['head'];
-              final shortSha = sha.substring(0, 7);
 
               // Fetch the actual commit details from the commits API
               try {

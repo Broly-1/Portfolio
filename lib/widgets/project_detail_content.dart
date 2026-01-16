@@ -29,7 +29,6 @@ class _ProjectDetailContentState extends State<ProjectDetailContent> {
   @override
   Widget build(BuildContext context) {
     final themeProvider = Provider.of<ThemeProvider>(context);
-    final isLightTheme = themeProvider.selectedTheme != 'Mocha';
     final width = MediaQuery.of(context).size.width;
     final isDesktop = width > 900;
 

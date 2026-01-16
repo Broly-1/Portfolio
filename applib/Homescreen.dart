@@ -5,6 +5,7 @@ import 'screens/manage_projects_screen.dart';
 import 'screens/edit_home_screen.dart';
 import 'screens/edit_resume_screen.dart';
 import 'screens/edit_stats_screen.dart';
+import 'screens/github_token_screen.dart';
 
 class AdminHomeScreen extends StatelessWidget {
   const AdminHomeScreen({super.key});
@@ -149,6 +150,20 @@ class AdminHomeScreen extends StatelessWidget {
                   context,
                   MaterialPageRoute(
                     builder: (context) => const EditStatsScreen(),
+                  ),
+                );
+              },
+            ),
+            _buildAdminCard(
+              context,
+              title: 'GitHub Token',
+              icon: Icons.key,
+              description: 'Set GitHub API token for higher rate limits',
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const GitHubTokenScreen(),
                   ),
                 );
               },

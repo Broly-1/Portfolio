@@ -65,6 +65,7 @@ class _DownloadsWidgetState extends State<DownloadsWidget> {
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
             children: [
               Row(
                 children: [
@@ -87,8 +88,9 @@ class _DownloadsWidgetState extends State<DownloadsWidget> {
               ),
               SizedBox(height: 24 * widget.scale),
               if (_isLoading)
-                Expanded(
-                  child: Center(
+                Center(
+                  child: Padding(
+                    padding: EdgeInsets.all(40 * widget.scale),
                     child: CircularProgressIndicator(
                       color: themeProvider.accentColor,
                       strokeWidth: 2,
@@ -96,8 +98,9 @@ class _DownloadsWidgetState extends State<DownloadsWidget> {
                   ),
                 )
               else if (_stats == null)
-                Expanded(
-                  child: Center(
+                Center(
+                  child: Padding(
+                    padding: EdgeInsets.all(40 * widget.scale),
                     child: Text(
                       'No data available',
                       style: TextStyle(
@@ -108,27 +111,25 @@ class _DownloadsWidgetState extends State<DownloadsWidget> {
                   ),
                 )
               else
-                Expanded(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      _buildPlatformStat(
-                        context,
-                        'iOS',
-                        _stats!.iosDownloads,
-                        Icons.apple,
-                        themeProvider,
-                      ),
-                      SizedBox(height: 8 * widget.scale),
-                      _buildPlatformStat(
-                        context,
-                        'Android',
-                        _stats!.androidDownloads,
-                        Icons.android,
-                        themeProvider,
-                      ),
-                    ],
-                  ),
+                Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    _buildPlatformStat(
+                      context,
+                      'iOS',
+                      _stats!.iosDownloads,
+                      Icons.apple,
+                      themeProvider,
+                    ),
+                    SizedBox(height: 8 * widget.scale),
+                    _buildPlatformStat(
+                      context,
+                      'Android',
+                      _stats!.androidDownloads,
+                      Icons.android,
+                      themeProvider,
+                    ),
+                  ],
                 ),
             ],
           ),

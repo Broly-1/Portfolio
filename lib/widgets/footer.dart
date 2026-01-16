@@ -108,7 +108,6 @@ class _FooterState extends State<Footer> with SingleTickerProviderStateMixin {
         final events = json.decode(response.body) as List;
 
         // Find the first PushEvent
-        bool foundCommit = false;
         for (var event in events) {
           if (event['type'] == 'PushEvent') {
             final repo = event['repo']['name'];
@@ -123,7 +122,6 @@ class _FooterState extends State<Footer> with SingleTickerProviderStateMixin {
                   _latestCommitHash = shortHash;
                 });
               }
-              foundCommit = true;
               break;
             }
           }
@@ -299,12 +297,15 @@ class _FooterState extends State<Footer> with SingleTickerProviderStateMixin {
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Text(
-              '© 2026 Hassan Kamran',
-              style: TextStyle(
-                color: textColor,
-                fontSize: 11,
-                letterSpacing: 0.5,
+            Flexible(
+              child: Text(
+                '© 2026 Hassan Kamran',
+                style: TextStyle(
+                  color: textColor,
+                  fontSize: 11,
+                  letterSpacing: 0.5,
+                ),
+                overflow: TextOverflow.ellipsis,
               ),
             ),
             const SizedBox(width: 8),
@@ -317,12 +318,15 @@ class _FooterState extends State<Footer> with SingleTickerProviderStateMixin {
               ),
             ),
             const SizedBox(width: 8),
-            Text(
-              'All Services Nominal',
-              style: TextStyle(
-                color: textColor,
-                fontSize: 11,
-                letterSpacing: 0.5,
+            Flexible(
+              child: Text(
+                'All Services Nominal',
+                style: TextStyle(
+                  color: textColor,
+                  fontSize: 11,
+                  letterSpacing: 0.5,
+                ),
+                overflow: TextOverflow.ellipsis,
               ),
             ),
           ],
@@ -330,20 +334,27 @@ class _FooterState extends State<Footer> with SingleTickerProviderStateMixin {
         const SizedBox(height: 12),
 
         // Bottom row: Time, Views, Commit, Socials
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
+        Wrap(
+          alignment: WrapAlignment.center,
+          crossAxisAlignment: WrapCrossAlignment.center,
+          spacing: 12,
+          runSpacing: 8,
           children: [
-            Icon(Icons.access_time, size: 12, color: textColor),
-            const SizedBox(width: 4),
-            Text(
-              _formatSessionTime(),
-              style: TextStyle(
-                color: textColor,
-                fontSize: 11,
-                letterSpacing: 0.5,
-              ),
+            Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(Icons.access_time, size: 12, color: textColor),
+                const SizedBox(width: 4),
+                Text(
+                  _formatSessionTime(),
+                  style: TextStyle(
+                    color: textColor,
+                    fontSize: 11,
+                    letterSpacing: 0.5,
+                  ),
+                ),
+              ],
             ),
-            const SizedBox(width: 12),
             Text(
               '${_viewCount} views',
               style: TextStyle(
@@ -352,21 +363,23 @@ class _FooterState extends State<Footer> with SingleTickerProviderStateMixin {
                 letterSpacing: 0.5,
               ),
             ),
-            if (_latestCommitHash != null) ...[
-              const SizedBox(width: 12),
-              Icon(Icons.commit, size: 12, color: textColor),
-              const SizedBox(width: 4),
-              Text(
-                _latestCommitHash!,
-                style: TextStyle(
-                  color: textColor,
-                  fontSize: 11,
-                  letterSpacing: 0.5,
-                  fontFamily: 'monospace',
-                ),
+            if (_latestCommitHash != null)
+              Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(Icons.commit, size: 12, color: textColor),
+                  const SizedBox(width: 4),
+                  Text(
+                    _latestCommitHash!,
+                    style: TextStyle(
+                      color: textColor,
+                      fontSize: 11,
+                      letterSpacing: 0.5,
+                      fontFamily: 'monospace',
+                    ),
+                  ),
+                ],
               ),
-            ],
-            const SizedBox(width: 12),
             _buildSocialLinks(textColor),
           ],
         ),

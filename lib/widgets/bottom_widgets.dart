@@ -59,9 +59,6 @@ class _BottomWidgetsState extends State<BottomWidgets>
 
     // Downloads widget is square, same height as commits
     final downloadsSquareSize = 250.0 * widget.scale;
-    // Commits width is adjusted to fit beside downloads within projectCardWidth total
-    final commitsWidthWithDownloads =
-        projectCardWidth - spacing - downloadsSquareSize;
 
     if (isMobile) {
       // Mobile: stack vertically

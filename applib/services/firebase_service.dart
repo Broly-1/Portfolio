@@ -42,7 +42,6 @@ class FirebaseService {
       }
       return null;
     } catch (e) {
-      print('Error getting about data: $e');
       rethrow;
     }
   }
@@ -55,7 +54,6 @@ class FirebaseService {
           .doc('main')
           .set(data, SetOptions(merge: true));
     } catch (e) {
-      print('Error saving about data: $e');
       rethrow;
     }
   }
@@ -79,7 +77,6 @@ class FirebaseService {
       final downloadUrl = await snapshot.ref.getDownloadURL();
       return downloadUrl;
     } catch (e) {
-      print('Error uploading image: $e');
       rethrow;
     }
   }
@@ -90,7 +87,6 @@ class FirebaseService {
       final ref = _storage.refFromURL(imageUrl);
       await ref.delete();
     } catch (e) {
-      print('Error deleting image: $e');
       // Don't rethrow - image might not exist
     }
   }
