@@ -186,11 +186,150 @@ class _ProjectDetailContentState extends State<ProjectDetailContent> {
     final isLightTheme = themeProvider.selectedTheme != 'Mocha';
     final isMobile = context.isMobile;
 
-    return Container(
-      constraints: BoxConstraints(
-        minHeight: isMobile ? 150 : 250,
-        maxHeight: isMobile ? 300 : 500,
+    final browserContent = AspectRatio(
+      aspectRatio: isMobile ? 16 / 12 : 16 / 10,
+      child: Container(
+        decoration: BoxDecoration(
+          color: isLightTheme
+              ? const Color(0xFF2D2D2D)
+              : const Color(0xFF1E1E2E),
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Browser header
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 12,
+                  ),
+                  decoration: BoxDecoration(
+                    color: isLightTheme
+                        ? Colors.grey[300]
+                        : Color.lerp(
+                            themeProvider.themeBackgroundColor,
+                            Colors.black,
+                            0.3,
+                          ),
+                    borderRadius: const BorderRadius.vertical(
+                      top: Radius.circular(12),
+                    ),
+                  ),
+                  child: Row(
+                    children: [
+                      _buildDot(const Color(0xFFF38BA8)),
+                      const SizedBox(width: 8),
+                      _buildDot(const Color(0xFFF9E2AF)),
+                      const SizedBox(width: 8),
+                      _buildDot(const Color(0xFFA6E3A1)),
+                    ],
+                  ),
+                ),
+                // Browser content
+                Padding(
+                  padding: EdgeInsets.all(isMobile ? 12 : 20),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // Repo name
+                      RichText(
+                        text: TextSpan(
+                          children: [
+                            const TextSpan(
+                              text: 'Broly-1',
+                              style: TextStyle(
+                                fontSize: 14,
+                                color: Color(0xFFF38BA8),
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                            TextSpan(
+                              text: ' / ',
+                              style: TextStyle(
+                                fontSize: 14,
+                                color:
+                                    (isLightTheme ? Colors.white : Colors.white)
+                                        .withOpacity(0.5),
+                              ),
+                            ),
+                            TextSpan(
+                              text: widget.project.name,
+                              style: TextStyle(
+                                fontSize: 14,
+                                color: themeProvider.accentColor,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      SizedBox(height: isMobile ? 8 : 12),
+                      // Description
+                      Text(
+                        widget.project.description,
+                        style: TextStyle(
+                          fontSize: isMobile ? 12 : 14,
+                          color: (isLightTheme ? Colors.white : Colors.white)
+                              .withOpacity(0.8),
+                        ),
+                        maxLines: 3,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+            // User info at bottom
+            Padding(
+              padding: EdgeInsets.all(isMobile ? 12 : 20),
+              child: Row(
+                children: [
+                  Container(
+                    width: isMobile ? 32 : 40,
+                    height: isMobile ? 32 : 40,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      border: Border.all(
+                        color: isLightTheme ? Colors.white : Colors.white,
+                        width: 2,
+                      ),
+                      image: const DecorationImage(
+                        image: NetworkImage(
+                          'https://avatars.githubusercontent.com/u/62743581?v=4',
+                        ),
+                        fit: BoxFit.cover,
+                      ),
+                    ),
+                  ),
+                  SizedBox(width: isMobile ? 8 : 12),
+                  Text(
+                    'Broly-1',
+                    style: TextStyle(
+                      fontSize: isMobile ? 12 : 14,
+                      color: (isLightTheme ? Colors.white : Colors.white)
+                          .withOpacity(0.7),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
+    );
+
+    if (isMobile) {
+      return browserContent;
+    }
+
+    return Container(
+      constraints: const BoxConstraints(minHeight: 250, maxHeight: 500),
       decoration: BoxDecoration(
         color: isLightTheme
             ? Colors.grey[200]
@@ -201,149 +340,8 @@ class _ProjectDetailContentState extends State<ProjectDetailContent> {
               ),
         borderRadius: BorderRadius.circular(16),
       ),
-      padding: EdgeInsets.all(isMobile ? 16 : 32),
-      child: Center(
-        child: AspectRatio(
-          aspectRatio: 16 / 10,
-          child: Container(
-            decoration: BoxDecoration(
-              color: isLightTheme
-                  ? const Color(0xFF2D2D2D)
-                  : const Color(0xFF1E1E2E),
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // Browser header
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 16,
-                        vertical: 12,
-                      ),
-                      decoration: BoxDecoration(
-                        color: isLightTheme
-                            ? Colors.grey[300]
-                            : Color.lerp(
-                                themeProvider.themeBackgroundColor,
-                                Colors.black,
-                                0.3,
-                              ),
-                        borderRadius: const BorderRadius.vertical(
-                          top: Radius.circular(12),
-                        ),
-                      ),
-                      child: Row(
-                        children: [
-                          _buildDot(const Color(0xFFF38BA8)),
-                          const SizedBox(width: 8),
-                          _buildDot(const Color(0xFFF9E2AF)),
-                          const SizedBox(width: 8),
-                          _buildDot(const Color(0xFFA6E3A1)),
-                        ],
-                      ),
-                    ),
-                    // Browser content
-                    Padding(
-                      padding: const EdgeInsets.all(20),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          // Repo name
-                          RichText(
-                            text: TextSpan(
-                              children: [
-                                const TextSpan(
-                                  text: 'Broly-1',
-                                  style: TextStyle(
-                                    fontSize: 16,
-                                    color: Color(0xFFF38BA8),
-                                    fontWeight: FontWeight.w500,
-                                  ),
-                                ),
-                                TextSpan(
-                                  text: ' / ',
-                                  style: TextStyle(
-                                    fontSize: 16,
-                                    color:
-                                        (isLightTheme
-                                                ? Colors.white
-                                                : Colors.white)
-                                            .withOpacity(0.5),
-                                  ),
-                                ),
-                                TextSpan(
-                                  text: widget.project.name,
-                                  style: TextStyle(
-                                    fontSize: 16,
-                                    color: themeProvider.accentColor,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                          const SizedBox(height: 12),
-                          // Description
-                          Text(
-                            widget.project.description,
-                            style: TextStyle(
-                              fontSize: 14,
-                              color:
-                                  (isLightTheme ? Colors.white : Colors.white)
-                                      .withOpacity(0.8),
-                            ),
-                            maxLines: 3,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-                // User info at bottom
-                Padding(
-                  padding: const EdgeInsets.all(20),
-                  child: Row(
-                    children: [
-                      Container(
-                        width: 40,
-                        height: 40,
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          border: Border.all(
-                            color: isLightTheme ? Colors.white : Colors.white,
-                            width: 2,
-                          ),
-                          image: const DecorationImage(
-                            image: NetworkImage(
-                              'https://avatars.githubusercontent.com/u/62743581?v=4',
-                            ),
-                            fit: BoxFit.cover,
-                          ),
-                        ),
-                      ),
-                      const SizedBox(width: 12),
-                      Text(
-                        'Broly-1',
-                        style: TextStyle(
-                          fontSize: 14,
-                          color: (isLightTheme ? Colors.white : Colors.white)
-                              .withOpacity(0.7),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
+      padding: const EdgeInsets.all(32),
+      child: Center(child: browserContent),
     );
   }
 

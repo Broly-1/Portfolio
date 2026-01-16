@@ -3,6 +3,7 @@ import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 import 'dart:async';
 import '../services/firebase_service.dart';
+import 'package:flutter_map_cancellable_tile_provider/flutter_map_cancellable_tile_provider.dart';
 
 class LocationMapWidget extends StatefulWidget {
   final double scale;
@@ -146,6 +147,8 @@ class _LocationMapWidgetState extends State<LocationMapWidget> {
                       'https://tiles.stadiamaps.com/tiles/alidade_smooth_dark/{z}/{x}/{y}{r}.png',
                   userAgentPackageName: 'com.hassankamran.portfolio',
                   maxZoom: 20,
+                  retinaMode: RetinaMode.isHighDensity(context),
+                  tileProvider: CancellableNetworkTileProvider(),
                 ),
                 MarkerLayer(
                   markers: [

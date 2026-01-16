@@ -198,23 +198,29 @@ class ProjectDetailScreen extends StatelessWidget {
             child: Material(
               color: Colors.transparent,
               child: Container(
-                constraints: const BoxConstraints(minHeight: 500),
                 decoration: BoxDecoration(
-                  color: isLightTheme
-                      ? Colors.grey[300]
-                      : const Color(0xFF313244),
-                  borderRadius: BorderRadius.circular(16),
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(
+                    color: Colors.white.withOpacity(0.1),
+                    width: 1,
+                  ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.3),
+                      blurRadius: 20,
+                      spreadRadius: 5,
+                    ),
+                  ],
                 ),
-                padding: const EdgeInsets.all(40),
-                child: Center(
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(12),
                   child: AspectRatio(
-                    aspectRatio: 16 / 10,
+                    aspectRatio: 16 / 12,
                     child: Container(
                       decoration: BoxDecoration(
                         color: isLightTheme
                             ? const Color(0xFF2D2D2D)
                             : const Color(0xFF1E1E2E),
-                        borderRadius: BorderRadius.circular(12),
                       ),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -345,9 +351,6 @@ class ProjectDetailScreen extends StatelessWidget {
             ),
           ),
 
-          const SizedBox(height: 24),
-
-          // Mobile screen preview
           Center(
             child: SizedBox(
               width: 200,
