@@ -72,3 +72,4 @@ android/key.properties
 
 # Local configuration
 local.properties
+.vercel

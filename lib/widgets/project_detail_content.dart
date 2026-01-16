@@ -3,6 +3,7 @@ import 'package:hassankamran/models/project.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:provider/provider.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import '../styles/theme_provider.dart';
 import '../Extensions/extensions.dart';
 import 'package:intl/intl.dart';
@@ -300,7 +301,7 @@ class _ProjectDetailContentState extends State<ProjectDetailContent> {
                         width: 2,
                       ),
                       image: const DecorationImage(
-                        image: NetworkImage(
+                        image: CachedNetworkImageProvider(
                           'https://avatars.githubusercontent.com/u/62743581?v=4',
                         ),
                         fit: BoxFit.cover,
@@ -396,10 +397,18 @@ class _ProjectDetailContentState extends State<ProjectDetailContent> {
                       child: ClipRRect(
                         borderRadius: BorderRadius.circular(25),
                         child: widget.project.thumbnailUrl != null
-                            ? Image.network(
-                                widget.project.thumbnailUrl!,
+                            ? CachedNetworkImage(
+                                imageUrl: widget.project.thumbnailUrl!,
                                 fit: BoxFit.cover,
-                                errorBuilder: (context, error, stackTrace) =>
+                                placeholder: (context, url) => Container(
+                                  color: Colors.grey[900],
+                                  child: const Center(
+                                    child: CircularProgressIndicator(
+                                      strokeWidth: 2,
+                                    ),
+                                  ),
+                                ),
+                                errorWidget: (context, url, error) =>
                                     _buildPlaceholder(context),
                               )
                             : _buildPlaceholder(context),

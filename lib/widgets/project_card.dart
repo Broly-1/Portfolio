@@ -229,7 +229,7 @@ class _ProjectCardState extends State<ProjectCard> {
                                     width: 2 * scale,
                                   ),
                                   image: const DecorationImage(
-                                    image: NetworkImage(
+                                    image: CachedNetworkImageProvider(
                                       'https://avatars.githubusercontent.com/u/62743581?v=4',
                                     ),
                                     fit: BoxFit.cover,
