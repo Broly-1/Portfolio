@@ -143,10 +143,9 @@ class _LocationMapWidgetState extends State<LocationMapWidget> {
               ),
               children: [
                 TileLayer(
-                  urlTemplate:
-                      'https://tiles.stadiamaps.com/tiles/alidade_smooth_dark/{z}/{x}/{y}{r}.png',
+                  urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
                   userAgentPackageName: 'com.hassankamran.portfolio',
-                  maxZoom: 20,
+                  maxZoom: 19,
                   retinaMode: RetinaMode.isHighDensity(context),
                   tileProvider: CancellableNetworkTileProvider(),
                 ),
