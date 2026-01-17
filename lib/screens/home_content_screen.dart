@@ -70,6 +70,7 @@ class _HomeContentScreenState extends State<HomeContentScreen>
                         homeContent.heading,
                         themeProvider.accentColor,
                         scale,
+                        isMobile,
                       );
                     },
                   ),
@@ -80,6 +81,7 @@ class _HomeContentScreenState extends State<HomeContentScreen>
                       context,
                       homeContent.paragraph,
                       scale,
+                      isMobile,
                     ),
                   ),
                   SizedBox(height: 32 * scale),
@@ -178,7 +180,10 @@ class _HomeContentScreenState extends State<HomeContentScreen>
                                         'Featured Projects',
                                         style: TextStyle(
                                           fontWeight: FontWeight.w600,
-                                          fontSize: 22 * scale,
+                                          fontSize:
+                                              22 *
+                                              scale *
+                                              (isMobile ? 1.0 : 1.25),
                                           letterSpacing: 1.6 * scale,
                                         ),
                                       ),
@@ -201,7 +206,10 @@ class _HomeContentScreenState extends State<HomeContentScreen>
                                                   style: TextStyle(
                                                     color: themeProvider
                                                         .accentColor,
-                                                    fontSize: 18 * scale,
+                                                    fontSize:
+                                                        18 *
+                                                        scale *
+                                                        (isMobile ? 1.0 : 1.25),
                                                     letterSpacing: 1.6 * scale,
                                                   ),
                                                 ),
@@ -382,16 +390,18 @@ class _HomeContentScreenState extends State<HomeContentScreen>
     String heading,
     Color accentColor,
     double scale,
+    bool isMobile,
   ) {
     final regex = RegExp(r'\{\{(.+?)\}\}');
     final matches = regex.allMatches(heading);
+    final fontSize = 36 * scale * (isMobile ? 1.0 : 1.25);
 
     if (matches.isEmpty) {
       // No accent markers, return plain text
       return Text(
         heading,
         style: TextStyle(
-          fontSize: 36 * scale,
+          fontSize: fontSize,
           fontWeight: FontWeight.w600,
           height: 1.2,
           letterSpacing: 1.6 * scale,
@@ -410,7 +420,7 @@ class _HomeContentScreenState extends State<HomeContentScreen>
           TextSpan(
             text: heading.substring(lastIndex, match.start),
             style: TextStyle(
-              fontSize: 36 * scale,
+              fontSize: fontSize,
               fontWeight: FontWeight.w600,
               height: 1.2,
               letterSpacing: 1.6 * scale,
@@ -425,7 +435,7 @@ class _HomeContentScreenState extends State<HomeContentScreen>
         TextSpan(
           text: match.group(1),
           style: TextStyle(
-            fontSize: 36 * scale,
+            fontSize: fontSize,
             fontWeight: FontWeight.w600,
             height: 1.2,
             letterSpacing: 1.6 * scale,
@@ -443,7 +453,7 @@ class _HomeContentScreenState extends State<HomeContentScreen>
         TextSpan(
           text: heading.substring(lastIndex),
           style: TextStyle(
-            fontSize: 36 * scale,
+            fontSize: fontSize,
             fontWeight: FontWeight.w600,
             height: 1.2,
             letterSpacing: 1.6 * scale,
@@ -464,9 +474,11 @@ class _HomeContentScreenState extends State<HomeContentScreen>
     BuildContext context,
     String paragraph,
     double scale,
+    bool isMobile,
   ) {
     final regex = RegExp(r'\[(.+?)\]\((.+?)\)');
     final matches = regex.allMatches(paragraph);
+    final fontSize = 18 * scale * (isMobile ? 1.0 : 1.25);
 
     if (matches.isEmpty) {
       // No links, return plain text
@@ -474,7 +486,7 @@ class _HomeContentScreenState extends State<HomeContentScreen>
         paragraph,
         textAlign: TextAlign.justify,
         style: TextStyle(
-          fontSize: 18 * scale,
+          fontSize: fontSize,
           height: 1.6,
           letterSpacing: 1.3 * scale,
           color: Color(0xFFB4B8C5),
@@ -492,7 +504,7 @@ class _HomeContentScreenState extends State<HomeContentScreen>
           TextSpan(
             text: paragraph.substring(lastIndex, match.start),
             style: TextStyle(
-              fontSize: 18 * scale,
+              fontSize: fontSize,
               height: 1.6,
               letterSpacing: 1.3 * scale,
               color: Color(0xFFB4B8C5),
@@ -514,7 +526,7 @@ class _HomeContentScreenState extends State<HomeContentScreen>
               child: Text(
                 linkText,
                 style: TextStyle(
-                  fontSize: 18 * scale,
+                  fontSize: fontSize,
                   height: 1.6,
                   letterSpacing: 1.3 * scale,
                   color: Provider.of<ThemeProvider>(
@@ -538,7 +550,7 @@ class _HomeContentScreenState extends State<HomeContentScreen>
         TextSpan(
           text: paragraph.substring(lastIndex),
           style: TextStyle(
-            fontSize: 18 * scale,
+            fontSize: fontSize,
             height: 1.6,
             letterSpacing: 1.3 * scale,
             color: Color(0xFFB4B8C5),

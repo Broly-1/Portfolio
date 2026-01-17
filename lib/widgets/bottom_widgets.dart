@@ -50,16 +50,6 @@ class _BottomWidgetsState extends State<BottomWidgets>
 
     // Match featured projects card width calculation exactly
     final spacing = 20.0 * widget.scale;
-    final projectCardWidth = widget.maxWidth.clamp(
-      300.0 * widget.scale,
-      600.0 * widget.scale,
-    );
-
-    // Small cards (Theme & Connect) together = one project card width
-    final smallCardWidth = (projectCardWidth - spacing) / 2;
-
-    // Downloads widget is square, same height as commits
-    final downloadsSquareSize = 250.0 * widget.scale;
 
     if (isMobile) {
       // Mobile: stack vertically
@@ -86,37 +76,46 @@ class _BottomWidgetsState extends State<BottomWidgets>
       );
     }
 
-    // Desktop: Simple wrap layout with explicit widths
-    return Wrap(
-      spacing: spacing,
-      runSpacing: spacing,
-      children: [
-        Row(
-          mainAxisSize: MainAxisSize.min,
+    // Desktop: Dynamic layout that scales with screen width
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final availableWidth = constraints.maxWidth;
+
+        // Calculate widths: 4 square widgets + 1 longer commits widget
+        // Theme, Connect, Location, Downloads = 1 unit each (square)
+        // Commits = 2 units (longer/wider)
+        // Total = 6 units with 4 gaps between 5 widgets
+        final totalGaps = spacing * 4;
+        final unitWidth = (availableWidth - totalGaps) / 6;
+
+        // Square widgets = 1 unit each
+        final squareSize = unitWidth;
+
+        // Commits card = 2 units (longer)
+        final commitsCardWidth = unitWidth * 2;
+
+        return Row(
           children: [
-            _buildAccentCard(context, false, smallCardWidth),
+            _buildAccentCard(context, false, squareSize),
             SizedBox(width: spacing),
-            _buildConnectCard(context, false, smallCardWidth),
-          ],
-        ),
-        _buildCommitsCard(context, false, projectCardWidth),
-        Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
+            _buildConnectCard(context, false, squareSize),
+            SizedBox(width: spacing),
+            _buildCommitsCard(context, false, commitsCardWidth),
+            SizedBox(width: spacing),
             LocationMapWidget(
               scale: widget.scale,
-              cardWidth: downloadsSquareSize,
+              cardWidth: squareSize,
               isMobile: false,
             ),
             SizedBox(width: spacing),
             DownloadsWidget(
               scale: widget.scale,
-              cardWidth: downloadsSquareSize,
+              cardWidth: squareSize,
               isMobile: false,
             ),
           ],
-        ),
-      ],
+        );
+      },
     );
   }
 
