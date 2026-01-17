@@ -72,7 +72,7 @@ class GitHubService {
       // Build headers with optional authentication
       final headers = {
         'Accept': 'application/vnd.github.v3+json',
-        if (token != null) 'Authorization': 'Bearer $token',
+        if (token != null) 'Authorization': 'token $token',
       };
 
       final response = await http
@@ -115,7 +115,10 @@ class GitHubService {
                     'https://api.github.com/repos/$repo/commits/$sha';
                 final commitResponse = await http.get(
                   Uri.parse(commitUrl),
-                  headers: {'Accept': 'application/vnd.github.v3+json'},
+                  headers: {
+                    'Accept': 'application/vnd.github.v3+json',
+                    if (token != null) 'Authorization': 'token $token',
+                  },
                 );
 
                 if (commitResponse.statusCode == 200) {

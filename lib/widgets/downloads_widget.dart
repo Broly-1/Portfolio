@@ -56,7 +56,7 @@ class _DownloadsWidgetState extends State<DownloadsWidget> {
       builder: (context, themeProvider, child) {
         return Container(
           width: widget.cardWidth,
-          height: widget.isMobile ? null : widget.cardWidth,
+          height: widget.isMobile ? null : 250 * widget.scale,
           padding: EdgeInsets.all(24 * widget.scale),
           decoration: BoxDecoration(
             color: const Color(0xFF2A2A3E),
