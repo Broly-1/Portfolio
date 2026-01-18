@@ -5,12 +5,16 @@ import 'package:hassankamran/styles/app_theme.dart';
 import 'package:provider/provider.dart';
 import 'package:hassankamran/styles/theme_provider.dart';
 import 'package:go_router/go_router.dart';
+import 'package:flutter/foundation.dart';
 
 import 'screens/home_page.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  // Initialize Firebase
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+
   runApp(
     ChangeNotifierProvider(
       create: (_) => ThemeProvider(),
@@ -65,13 +69,16 @@ class MyApp extends StatelessWidget {
       // Performance optimizations
       builder: (context, child) {
         return MediaQuery(
-          data: MediaQuery.of(context).copyWith(
-            textScaler:
-                TextScaler.noScaling, // Prevent system font scaling issues
-          ),
+          data: MediaQuery.of(
+            context,
+          ).copyWith(textScaler: TextScaler.noScaling),
           child: child!,
         );
       },
+      // Reduce unnecessary repaints
+      scrollBehavior: const MaterialScrollBehavior().copyWith(
+        scrollbars: false,
+      ),
     );
   }
 }

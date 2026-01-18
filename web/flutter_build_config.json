@@ -1,0 +1,10 @@
+{
+  "optimization": {
+    "minify": true,
+    "tree-shake-icons": true,
+    "split-debug-info": true,
+    "obfuscate": false
+  },
+  "target": "web",
+  "renderer": "auto"
+}

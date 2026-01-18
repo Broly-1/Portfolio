@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
   <!--
     If you are serving your web app in a path other than the root, change the
@@ -21,7 +21,7 @@
   <meta name="description" content="Hassan Kamran - Full Stack Flutter Developer specializing in cross-platform mobile and web applications. Expert in Flutter, Firebase, and modern app development.">
   <meta name="keywords" content="Hassan Kamran, Flutter Developer, Mobile Developer, Full Stack Developer, Firebase, Dart, iOS, Android, Web Development, Portfolio">
   <meta name="author" content="Hassan Kamran">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
   
   <!-- Open Graph / Facebook -->
   <meta property="og:type" content="website">
@@ -41,10 +41,17 @@
   <link rel="canonical" href="https://hassankamran.web.app/">
   
   <!-- Performance optimizations -->
-  <link rel="preconnect" href="https://firebasestorage.googleapis.com">
+  <link rel="preconnect" href="https://firebasestorage.googleapis.com" crossorigin>
   <link rel="dns-prefetch" href="https://firebasestorage.googleapis.com">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
   <link rel="dns-prefetch" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="dns-prefetch" href="https://fonts.gstatic.com">
+  <link rel="preconnect" href="https://www.gstatic.com" crossorigin>
+  
+  <!-- Preload critical resources -->
+  <link rel="modulepreload" href="flutter_bootstrap.js">
+  <link rel="prefetch" href="main.dart.js" as="script">
 
   <!-- iOS meta tags & icons -->
   <meta name="mobile-web-app-capable" content="yes">
@@ -63,6 +70,7 @@
     body {
       margin: 0;
       background-color: #1E1E2E;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
     }
     
     #loading {
@@ -73,9 +81,17 @@
       height: 100%;
       background-color: #1E1E2E;
       display: flex;
+      flex-direction: column;
       align-items: center;
       justify-content: center;
       z-index: 9999;
+      opacity: 1;
+      transition: opacity 0.5s ease-out;
+    }
+    
+    #loading.loaded {
+      opacity: 0;
+      pointer-events: none;
     }
     
     .loader {
@@ -87,6 +103,13 @@
       animation: spin 1s linear infinite;
     }
     
+    .loading-text {
+      color: #C6A0F6;
+      margin-top: 20px;
+      font-size: 18px;
+      font-weight: 500;
+    }
+    
     @keyframes spin {
       to { transform: rotate(360deg); }
     }
@@ -95,20 +118,37 @@
 <body>
   <div id="loading">
     <div class="loader"></div>
+    <div class="loading-text">Loading Portfolio...</div>
   </div>
   
   <script>
     // Remove loading screen once Flutter app loads
-    window.addEventListener('flutter-first-frame', function() {
+    let loadingRemoved = false;
+    
+    function removeLoading() {
+      if (loadingRemoved) return;
+      loadingRemoved = true;
+      
       const loading = document.getElementById('loading');
       if (loading) {
-        loading.style.opacity = '0';
-        loading.style.transition = 'opacity 0.3s';
-        setTimeout(() => loading.remove(), 300);
+        loading.classList.add('loaded');
+        setTimeout(() => loading.remove(), 500);
       }
-    });
+    }
+    
+    window.addEventListener('flutter-first-frame', removeLoading);
+    
+    // Fallback: remove loading screen after 10 seconds even if Flutter doesn't load
+    setTimeout(removeLoading, 10000);
+    
+    // Defer non-critical resources
+    if ('requestIdleCallback' in window) {
+      requestIdleCallback(() => {
+        // Preload critical fonts or resources here if needed
+      });
+    }
   </script>
   
-  <script src="flutter_bootstrap.js" async></script>
+  <script src="flutter_bootstrap.js" async defer></script>
 </body>
 </html>

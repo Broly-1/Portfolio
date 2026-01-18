@@ -1,11 +1,11 @@
 {
-    "name": "hassankamran",
-    "short_name": "hassankamran",
+    "name": "Hassan Kamran - Flutter Developer Portfolio",
+    "short_name": "HK Portfolio",
     "start_url": ".",
     "display": "standalone",
-    "background_color": "#0175C2",
-    "theme_color": "#0175C2",
-    "description": "A new Flutter project.",
+    "background_color": "#1E1E2E",
+    "theme_color": "#C6A0F6",
+    "description": "Full Stack Flutter Developer specializing in cross-platform mobile and web applications. Expert in Flutter, Firebase, and modern app development.",
     "orientation": "portrait-primary",
     "prefer_related_applications": false,
     "icons": [
